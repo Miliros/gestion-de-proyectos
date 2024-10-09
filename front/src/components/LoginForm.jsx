@@ -1,22 +1,23 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../redux/slices/authSlice";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const { loading, error } = useSelector((state) => state.auth); // tomo el estado de  authSlice
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simular autenticación
-    if (email === "test@example.com" && password === "password123") {
-      console.log("Autenticación exitosa");
-      alert("Login exitoso"); // Simulo exito
-      navigate("/dashboard"); // Redirigimos  a /dashboard
-    } else {
-      console.log("Credenciales incorrectas");
-      alert("Credenciales incorrectas");
+    // Despacho la accion loginUser con los datos del usuario
+    const result = await dispatch(loginUser({ email, password }));
+    if (result.type === "auth/loginUser/fulfilled") {
+      navigate("/dashboard"); // Redirigir al dashboard si el login fue exitoso
     }
   };
 
@@ -33,6 +34,8 @@ function LoginForm() {
                 >
                   Log in
                 </h3>
+
+                {error && <p className="text-danger">{error}</p>}
 
                 <div className="form-outline mb-4">
                   <input
@@ -66,8 +69,9 @@ function LoginForm() {
                   <button
                     className="btn btn-info btn-lg btn-block"
                     type="submit"
+                    disabled={loading}
                   >
-                    Login
+                    {loading ? "Cargando..." : "Login"}
                   </button>
                 </div>
 
