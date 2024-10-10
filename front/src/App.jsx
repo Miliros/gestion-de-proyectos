@@ -1,15 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import Dashboard from "./components/Dashboard";
-import CreateProject from "./components/Project";
+import Dashboard from "./components/Home";
+import CreateProject from "./components/Projects";
+import Home from "./components/Home";
+import Projects from "./components/Projects";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LoginForm />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/crear-proyecto" element={<CreateProject />} />
+        <Route path="/dashboard" element={<Home />} />
+        <Route path="/projects" element={<Projects />} />
       </Routes>
     </Router>
   );

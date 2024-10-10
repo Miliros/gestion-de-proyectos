@@ -14,14 +14,23 @@ const pool = new Pool({
 // Obtener todos los proyectos
 export const getAllProjects = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM proyectos");
+    const result = await pool.query(`
+      SELECT 
+        p.id, 
+        p.nombre, 
+        p.descripcion, 
+        p.fecha_inicio, 
+        p.fecha_finalizacion, 
+        u.nombre AS usuario_nombre  -- Obtiene el nombre del usuario
+      FROM proyectos p
+      JOIN usuarios u ON p.usuario_id = u.id  -- Realiza el JOIN
+    `);
     res.json(result.rows);
   } catch (error) {
     console.error("Error al obtener proyectos:", error);
     res.status(500).json({ error: "Error al obtener proyectos" });
   }
 };
-
 // Obtener un proyecto por ID
 export const getProjectById = async (req, res) => {
   const { id } = req.params;
@@ -42,19 +51,32 @@ export const getProjectById = async (req, res) => {
 // Crear un nuevo proyecto
 
 export const createProject = async (req, res) => {
-  const { nombre, descripcion, usuario_id } = req.body; // desestructuro usuario_id
+  const { nombre, descripcion, fecha_inicio, fecha_finalizacion, usuario_id } =
+    req.body;
 
   try {
-    console.log("Datos a insertar:", { nombre, descripcion, usuario_id });
+    console.log("Datos a insertar:", {
+      nombre,
+      descripcion,
+      fecha_inicio,
+      fecha_finalizacion,
+      usuario_id,
+    });
 
     const result = await pool.query(
-      "INSERT INTO proyectos (nombre, descripcion, usuario_id) VALUES ($1, $2, $3) RETURNING id",
-      [nombre, descripcion, usuario_id]
+      `INSERT INTO proyectos (nombre, descripcion, fecha_inicio, fecha_finalizacion, usuario_id) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [nombre, descripcion, fecha_inicio, fecha_finalizacion, usuario_id]
     );
 
-    res
-      .status(201)
-      .json({ id: result.rows[0].id, nombre, descripcion, usuario_id }); // Incluye usuario_id en la respuesta
+    res.status(201).json({
+      id: result.rows[0].id,
+      nombre,
+      descripcion,
+      fecha_inicio,
+      fecha_finalizacion,
+      usuario_id,
+    });
   } catch (error) {
     console.error("Error al crear el proyecto:", error);
     res.status(500).json({ error: "Error al crear el proyecto" });
@@ -62,13 +84,19 @@ export const createProject = async (req, res) => {
 };
 
 // Actualizar un proyecto
+// Actualizar un proyecto
 export const updateProject = async (req, res) => {
   const { id } = req.params;
-  const { nombre, descripcion } = req.body;
+  const { nombre, descripcion, fecha_inicio, fecha_finalizacion, usuario_id } =
+    req.body; // Agregar los campos de fecha y usuario
+
   try {
     const result = await pool.query(
-      "UPDATE proyectos SET nombre = $1, descripcion = $2 WHERE id = $3 RETURNING *",
-      [nombre, descripcion, id]
+      `UPDATE proyectos 
+       SET nombre = $1, descripcion = $2, fecha_inicio = $3, fecha_finalizacion = $4, usuario_id = $5 
+       WHERE id = $6 
+       RETURNING *`,
+      [nombre, descripcion, fecha_inicio, fecha_finalizacion, usuario_id, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Proyecto no encontrado" });

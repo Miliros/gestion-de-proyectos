@@ -1,0 +1,25 @@
+.narrowInputs {
+  width: 350px !important;
+}
+.group {
+  display: flex !important;
+  /* width: 50%; */
+  justify-content: center !important;
+  flex-direction: column !important;
+}
+.buttonAdd {
+  margin-right: 20px;
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  width: 120px;
+  height: 36px;
+  font-family: satoshi;
+  border: 1px solid black;
+}
+.buttonAdd:hover {
+  background-color: #b1ada2a9;
+  color: black;
+  font-weight: 600;
+  border: none;
+}
