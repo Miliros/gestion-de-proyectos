@@ -1,0 +1,56 @@
+.taskTitle {
+  font-size: 19px; /* Hacer el tamaño del texto más pequeño */
+}
+
+.textSuccess {
+  color: green;
+  line-height: 200;
+  font-size: 16px !important;
+}
+
+.textDanger {
+  color: red;
+  line-height: 200;
+  font-size: 16px !important;
+}
+
+.buttonSave {
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  width: 120px;
+  height: 36px;
+  font-family: satoshi;
+  border: 1px solid black;
+}
+.button {
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  width: 120px;
+  height: 36px;
+  font-family: satoshi;
+  border: 1px solid black;
+}
+.button:hover {
+  background-color: #b1ada2a9;
+  color: black;
+  font-weight: 600;
+  border: none;
+}
+.buttonAdd {
+  margin-left: 20px;
+  background-color: black;
+  color: white;
+  font-size: 10px;
+  width: 120px;
+  height: 30px;
+  font-family: satoshi;
+  border: 1px solid black;
+}
+.buttonAdd:hover {
+  background-color: #b1ada2a9;
+  color: black;
+  font-weight: 600;
+  border: none;
+}

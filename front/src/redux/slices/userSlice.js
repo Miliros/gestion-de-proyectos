@@ -37,5 +37,9 @@ export const selectUsers = (state) => state.users.users;
 export const selectLoading = (state) => state.users.loading;
 export const selectError = (state) => state.users.error;
 
+// Nuevo selector para obtener un usuario específico por ID
+export const selectUserById = (state, userId) =>
+  state.users.users.find((user) => user.id === userId);
+
 // Exportar el reducer
 export default userSlice.reducer;

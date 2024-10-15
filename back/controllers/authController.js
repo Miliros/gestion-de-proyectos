@@ -3,10 +3,8 @@ import jwt from "jsonwebtoken";
 import pkg from "pg";
 import dotenv from "dotenv";
 
-// Cargar las variables de entorno desde el archivo .env
 dotenv.config();
 
-// Configuración de la base de datos
 const { Pool } = pkg;
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -16,15 +14,14 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Registro
 export const register = async (req, res) => {
-  const { nombre, email, password, rol } = req.body; // Desestructurar nombre y rol
+  const { nombre, email, password, rol } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     const result = await pool.query(
       "INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ($1, $2, $3, $4) RETURNING id",
-      [nombre, email, hashedPassword, rol] // Agregar nombre y rol a la consulta
+      [nombre, email, hashedPassword, rol]
     );
 
     res.status(201).json({ userId: result.rows[0].id });

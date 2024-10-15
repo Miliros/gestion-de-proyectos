@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../redux/slices/authSlice";
+import { loginUser } from "../../redux/slices/authSlice";
+
+import log from "../Login/log.jpg";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -91,7 +93,7 @@ function LoginForm() {
           </div>
           <div className="col-sm-6 px-0 d-none d-sm-block">
             <img
-              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img3.webp"
+              src={log}
               alt="Login image"
               className="w-100 vh-100"
               style={{ objectFit: "cover", objectPosition: "left" }}

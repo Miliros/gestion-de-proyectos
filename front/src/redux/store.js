@@ -3,11 +3,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import projectReducer from "./slices/projectSlice";
 import userReducer from "./slices/userSlice";
+import taskSlice from "./slices/taskSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
     projects: projectReducer,
-    users: userReducer, // Agregar el reducer de usuarios
+    users: userReducer,
+    tasks: taskSlice,
   },
 });
 
