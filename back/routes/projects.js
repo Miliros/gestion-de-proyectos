@@ -5,6 +5,7 @@ import {
   createProject,
   updateProject,
   deleteProject,
+  getProjectsByUserId,
 } from "../controllers/projectController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js"; // Asegúrate de importar el middleware
 
@@ -16,6 +17,8 @@ router.use(authMiddleware);
 // Rutas para proyectos
 router.get("/", getAllProjects);
 router.get("/:id", getProjectById);
+router.get("/usuario/:userId", getProjectsByUserId);
+
 router.post("/", createProject);
 router.put("/:id", updateProject);
 router.delete("/:id", deleteProject);

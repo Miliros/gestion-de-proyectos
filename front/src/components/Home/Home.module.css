@@ -2,12 +2,24 @@
   display: flex;
   flex-direction: column;
   /* align-items: center; */
-  gap: 10px; /* Espacio entre el texto y el botón */
+  gap: 40px; /* Espacio entre el texto y el botón */
+  background-color: black;
 }
 .Title {
   display: flex;
   justify-content: flex-start;
+  color: white;
+  font-size: 50px;
 }
 .cntn {
-  padding: 5px;
+  /* padding-top: 5px; */
+  background-image: url("home.jpg");
+  max-width: 100%;
+  height: 535px;
+  display: flex;
+  align-items: center;
+}
+.imgHome {
+  max-width: 100%;
+  height: 500px;
 }

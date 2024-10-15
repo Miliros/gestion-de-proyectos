@@ -9,16 +9,19 @@ import Navbar from "../NavBar/NavBar";
 const Home = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const user = useSelector((state) => state.auth.user);
-
   return (
     <div className={styles.cntnHome}>
       <Navbar />
+      {/* <img src={home} alt="home-image" className={styles.imgHome} /> */}
+      <div className={styles.cntn}>
+        <div className={styles.Title}>Bienvenido/a, {user?.nombre}</div>
+      </div>
       {isAuthenticated ? (
-        <div className={styles.cntn}>
-          <div className={styles.Title}>Bienvenido, {user?.nombre}</div>
-
-          {user?.rol === "admin" ? <Projects /> : <UserTareas />}
-        </div>
+        user?.rol === "admin" ? (
+          <Projects />
+        ) : (
+          <UserTareas />
+        )
       ) : (
         <div>
           <h1>Por favor, inicia sesión</h1>

@@ -107,6 +107,36 @@ export const updateProject = async (req, res) => {
     res.status(500).json({ error: "Error al actualizar proyecto" });
   }
 };
+// Obtener proyectos asignados a un usuario por su ID
+export const getProjectsByUserId = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const result = await pool.query(
+      `
+      SELECT 
+        p.id, 
+        p.nombre, 
+        p.descripcion, 
+        p.fecha_inicio, 
+        p.fecha_finalizacion
+      FROM proyectos p
+      WHERE p.usuario_id = $1
+    `,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No se encontraron proyectos para este usuario" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener proyectos por usuario:", error);
+    res.status(500).json({ error: "Error al obtener proyectos" });
+  }
+};
 
 // Eliminar un proyecto
 export const deleteProject = async (req, res) => {

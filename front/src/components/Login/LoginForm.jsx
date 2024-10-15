@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../redux/slices/authSlice";
+import styles from "./LoginForm.module.css";
 
 import log from "../Login/log.jpg";
 
@@ -30,12 +31,12 @@ function LoginForm() {
           <div className="col-sm-6 text-black">
             <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
               <form onSubmit={handleSubmit} style={{ width: "23rem" }}>
-                <h3
+                <h2
                   className="fw-normal mb-3 pb-3"
-                  style={{ letterSpacing: "1px" }}
+                  // style={{ letterSpacing: "1px" }}
                 >
                   Log in
-                </h3>
+                </h2>
 
                 {error && <p className="text-danger">{error}</p>}
 
@@ -69,7 +70,7 @@ function LoginForm() {
 
                 <div className="pt-1 mb-4">
                   <button
-                    className="btn btn-info btn-lg btn-block"
+                    className={styles.buttonLog}
                     type="submit"
                     disabled={loading}
                   >

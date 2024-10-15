@@ -1,13 +1,9 @@
-.cntnNav {
-  padding-top: 15px;
-  background-color: black;
-}
 .buttonLog {
   margin-right: 20px;
   background-color: black;
   color: white;
   font-size: 12px;
-  width: 100%;
+  width: 120px;
   height: 36px;
   font-family: satoshi;
   border: 1px solid black;

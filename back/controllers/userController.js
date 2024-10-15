@@ -21,3 +21,21 @@ export const getAllUsuarios = async (req, res) => {
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 };
+
+// Eliminar un usuario por ID
+export const deleteUsuario = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM usuarios WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json({ message: "Usuario eliminado", usuario: result.rows[0] });
+  } catch (error) {
+    console.error("Error al eliminar usuario:", error);
+    res.status(500).json({ error: "Error al eliminar usuario" });
+  }
+};

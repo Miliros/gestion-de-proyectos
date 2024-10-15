@@ -48,10 +48,20 @@ export const deleteProject = createAsyncThunk(
   async (id) => {
     await axios.delete(`${API_URL}/${id}`, {
       headers: {
-        Authorization: `Bearer ${getToken()}`, // Añadir el token al encabezado
+        Authorization: `Bearer ${getToken()}`,
       },
     });
-    return id; // Devolver el ID para eliminarlo del estado
+    return id;
+  }
+);
+//  obtener proyectos por userId
+export const fetchProjectsByUser = createAsyncThunk(
+  "projects/fetchProjectsByUser",
+  async (userId) => {
+    const response = await axios.get(`${API_URL}/usuario/${userId}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data;
   }
 );
 
@@ -91,6 +101,17 @@ const projectSlice = createSlice({
         state.projects = state.projects.filter(
           (project) => project.id !== action.payload
         );
+      })
+      .addCase(fetchProjectsByUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProjectsByUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload;
+      })
+      .addCase(fetchProjectsByUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

@@ -7,8 +7,12 @@ import {
   updateProject,
 } from "../../redux/slices/projectSlice";
 import { fetchUsers } from "../../redux/slices/userSlice";
+import { FiEdit } from "react-icons/fi";
+import { MdOutlineDelete } from "react-icons/md";
+
 import styles from "./Projects.module.css";
 import Task from "../Task/Task";
+import NewProjectForm from "./NewProjectForm";
 
 const Projects = () => {
   const dispatch = useDispatch();
@@ -133,16 +137,16 @@ const Projects = () => {
     e.preventDefault();
     handleAddProject();
   };
-  console.log(projects);
+  // console.log(projects);
   return (
-    <section>
+    <section className={styles.cntnProject}>
       <h2>Proyectos Activos</h2>
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="row">
+        <div className={`row ${styles.cntnProjets}`}>
           {projects.map((project) => (
-            <div key={project.id} className="col-md-4 mb-4">
+            <div key={project.id} className="col-md-3 mb-3.5 ">
               <div className="card text-center">
                 <div className="card-header">{project.nombre}</div>
                 <div className="card-body">
@@ -214,18 +218,12 @@ const Projects = () => {
                       </button>
                     ) : (
                       <>
-                        <button
-                          className="btn btn-secondary btn-sm me-2"
-                          onClick={() => handleEditProject(project)}
-                        >
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm me-2"
-                          onClick={() => handleDeleteProject(project.id)}
-                        >
-                          <i className="fas fa-trash-alt"></i>
-                        </button>
+                        <div onClick={() => handleEditProject(project)}>
+                          <FiEdit size={20} />
+                        </div>
+                        <div onClick={() => handleDeleteProject(project.id)}>
+                          <MdOutlineDelete size={23} color="red" />
+                        </div>
                       </>
                     )}
                   </div>
@@ -236,60 +234,13 @@ const Projects = () => {
         </div>
       )}
 
-      <hr className="my-4" />
-      <h2>Crear un nuevo proyecto</h2>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <div className="d-flex flex-column">
-            <input
-              type="text"
-              className="form-control mb-2"
-              placeholder="Nombre del Proyecto"
-              name="nombre"
-              value={newProject.nombre}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              className="form-control mb-2"
-              placeholder="Descripción"
-              name="descripcion"
-              value={newProject.descripcion}
-              onChange={handleChange}
-            />
-            <input
-              type="date"
-              className="form-control mb-2"
-              name="fecha_inicio"
-              value={newProject.fecha_inicio}
-              onChange={handleChange}
-            />
-            <input
-              type="date"
-              className="form-control mb-2"
-              name="fecha_finalizacion"
-              value={newProject.fecha_finalizacion}
-              onChange={handleChange}
-            />
-            <select
-              className="form-control mb-2"
-              name="usuario_id"
-              value={newProject.usuario_id}
-              onChange={handleChange}
-            >
-              <option value="">Selecciona un usuario</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.nombre}
-                </option>
-              ))}
-            </select>
-            <button type="submit" className={styles.buttonAdd}>
-              Añadir Proyecto
-            </button>
-          </div>
-        </form>
-      </div>
+      <NewProjectForm
+        newProject={newProject}
+        users={users}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+      />
+      <Task />
     </section>
   );
 };
