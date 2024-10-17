@@ -17,3 +17,30 @@ body {
     height: 100%;
   }
 }
+
+.form-check-input:checked {
+  background-color: black !important;
+  box-shadow: none !important;
+}
+.modal {
+  box-shadow: none !important;
+}
+
+.modal-header .btn-close {
+  padding-right: 20px !important;
+}
+
+.modal-header .btn-close:focus {
+  box-shadow: none !important;
+}
+.form-control:focus {
+  box-shadow: none !important;
+  border: 1px solid black !important;
+}
+/* .active > form-check-input {
+  background-color: black !important;
+}
+form-check-input:focus {
+  box-shadow: none !important;
+  border: 1px solid black !important;
+} */

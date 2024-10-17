@@ -4,7 +4,7 @@ import styles from "./Projects.module.css";
 const NewProjectForm = ({ newProject, users, handleChange, handleSubmit }) => {
   return (
     <section className={styles.cntnNew}>
-      <h2>Crear un nuevo proyecto</h2>
+      {/* <h2>Nuevo proyecto</h2> */}
       <form onSubmit={handleSubmit}>
         <div>
           <input
