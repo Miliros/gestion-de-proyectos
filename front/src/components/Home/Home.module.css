@@ -1,22 +1,23 @@
 .cntnHome {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   /* align-items: center; */
   gap: 40px; /* Espacio entre el texto y el botón */
-  background-color: black;
+  /* background-color: black; */
+  height: 100vh;
+  background-image: url("home.jpg");
 }
 .Title {
   display: flex;
   justify-content: flex-start;
   color: white;
-  font-size: 50px;
+  font-size: 30px;
+  width: 80%;
 }
 .cntn {
-  /* padding-top: 5px; */
-  background-image: url("home.jpg");
-  max-width: 100%;
-  height: 235px;
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 .imgHome {

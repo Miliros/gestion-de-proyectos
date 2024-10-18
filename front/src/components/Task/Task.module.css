@@ -1,3 +1,14 @@
+.cntnTask {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: red;
+  padding: 30px;
+  width: 80%;
+  border: 1px solid black;
+}
+
 .taskTitle {
   font-size: 19px; /* Hacer el tamaño del texto más pequeño */
 }

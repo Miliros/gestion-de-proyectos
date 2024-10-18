@@ -12,6 +12,7 @@ const pool = new Pool({
 });
 
 // Crear una nueva tarea
+// Crear una nueva tarea
 export const createTask = async (req, res) => {
   const { nombre, descripcion, estado, proyecto_id, asignada_a } = req.body;
   console.log(
@@ -20,10 +21,20 @@ export const createTask = async (req, res) => {
     estado,
     proyecto_id,
     asignada_a,
-    "jjjjjjjjjjjjjj"
+    "Información de la tarea"
   );
 
   try {
+    // Verificar si el usuario existe antes de crear la tarea
+    const userExists = await pool.query(
+      `SELECT id FROM usuarios WHERE id = $1`,
+      [asignada_a]
+    );
+
+    if (userExists.rows.length === 0) {
+      return res.status(400).json({ error: "El usuario asignado no existe" });
+    }
+
     // Crear la tarea
     const result = await pool.query(
       `INSERT INTO tareas (nombre, descripcion, estado, proyecto_id, asignada_a) 
@@ -53,7 +64,7 @@ export const createTask = async (req, res) => {
     res.status(201).json({
       ...task,
       usuario_nombre: usuarioNombre,
-      proyecto_nombre: proyectoNombre, // Incluir el nombre del proyecto en la respuesta
+      proyecto_nombre: proyectoNombre,
     });
   } catch (error) {
     console.error("Error al crear tarea:", error);
@@ -116,5 +127,32 @@ export const getTasksByProject = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener tareas:", error);
     res.status(500).json({ error: "Error al obtener tareas" });
+  }
+};
+// Obtener todas las tareas
+export const getAllTasks = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+        t.id, 
+        t.nombre, 
+        t.descripcion, 
+        t.estado, 
+        t.proyecto_id, 
+        u.nombre AS usuario_nombre,
+        p.nombre AS proyecto_nombre
+      FROM tareas t
+      JOIN usuarios u ON t.asignada_a = u.id
+      JOIN proyectos p ON t.proyecto_id = p.id`
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No se encontraron tareas" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener todas las tareas:", error);
+    res.status(500).json({ error: "Error al obtener todas las tareas" });
   }
 };

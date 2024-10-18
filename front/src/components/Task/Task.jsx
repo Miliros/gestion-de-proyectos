@@ -5,6 +5,7 @@ import {
   createTask,
   updateTask,
   fetchTasksByProject,
+  fetchAllTasks,
 } from "../../redux/slices/taskSlice";
 import { fetchProjects } from "../../redux/slices/projectSlice";
 import TaskItem from "../TaskItem/TaskItem";
@@ -40,6 +41,7 @@ const Task = () => {
   useEffect(() => {
     dispatch(fetchUsers());
     dispatch(fetchProjects());
+    dispatch(fetchAllTasks());
   }, [dispatch]);
 
   // useEffect para sincronizar tareas desde Redux
@@ -164,7 +166,7 @@ const Task = () => {
   };
 
   return (
-    <section className="vh-30">
+    <section className={styles.cntnTask}>
       <div className="container py-5 h-10">
         <div className="row d-flex justify-content-center align-items-center h-100">
           <div className="col col-lg-8 col-xl-6">

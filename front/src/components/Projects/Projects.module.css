@@ -4,15 +4,16 @@
   justify-content: center;
   align-items: center;
   background-color: white;
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding: 30px;
+  width: 80%;
+  border: 1px solid black;
 }
 .cntnProjets {
   justify-content: center;
   padding: 60px;
 }
 .cntnTable {
-  width: 70%;
+  width: 95%;
   border-collapse: collapse;
 
   box-shadow: 0px 0px 4px rgba(148, 133, 122, 0.8);

@@ -7,7 +7,18 @@ const getToken = () => {
   return localStorage.getItem("token"); // Obtengo el token del localStorage
 };
 
-// Acción asíncrona para obtener las tareas filtradas por proyecto
+// Acción asíncrona para obtener todas las tareas
+export const fetchAllTasks = createAsyncThunk(
+  "tasks/fetchAll/all",
+  async () => {
+    const response = await axios.get(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
+      },
+    });
+    return response.data; // Asegúrate de que la respuesta sea el formato esperado
+  }
+);
 // Acción asíncrona para obtener las tareas filtradas por proyecto
 export const fetchTasksByProject = createAsyncThunk(
   "tasks/fetchByProject",
@@ -56,6 +67,17 @@ const tasksSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAllTasks.pending, (state) => {
+        state.loading = true; // Comienza la carga
+      })
+      .addCase(fetchAllTasks.fulfilled, (state, action) => {
+        state.loading = false; // Finaliza la carga
+        state.tasks = action.payload; // Guarda todas las tareas
+      })
+      .addCase(fetchAllTasks.rejected, (state, action) => {
+        state.loading = false; // Finaliza la carga
+        state.error = action.error.message; // Manejo de error
+      })
       .addCase(fetchTasksByProject.pending, (state) => {
         state.loading = true; // Comienza la carga
       })

@@ -14,6 +14,7 @@ import styles from "./Projects.module.css";
 import Table from "react-bootstrap/Table";
 import { Modal, Button } from "react-bootstrap";
 import NewProjectForm from "./NewProjectForm";
+import Task from "../Task/Task";
 
 const Projects = () => {
   const dispatch = useDispatch();
@@ -244,7 +245,7 @@ const Projects = () => {
           </Table>
         </div>
       )}
-
+      {/* <Task /> */}
       {/* Modal para crear proyecto */}
       <Modal
         show={show}

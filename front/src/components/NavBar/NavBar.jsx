@@ -12,7 +12,7 @@ const Navbar = () => {
 
   return (
     <div className={styles.cntnNav}>
-      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary ">
         <div class="container-fluid ">
           <a class="navbar-brand" href="#">
             GESTION DE PROYECTOS
@@ -31,25 +31,16 @@ const Navbar = () => {
           <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">
-                  Home
+                <a class="nav-link active" aria-current="page" href="/tasks">
+                  Tasks
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  Projects
+                  Users
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  New Project
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  New Task
-                </a>
-              </li>
+
               {/* <li class="nav-item">
               <a class="nav-link disabled" aria-disabled="true">
                 Disabled

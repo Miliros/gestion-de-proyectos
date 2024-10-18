@@ -1,8 +1,12 @@
-.cntnProject {
+.cntnUserTareas {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   background-color: white;
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding: 30px;
+  width: 80%;
+  border: 1px solid black;
 }
 .cntnProjets {
   justify-content: center;
@@ -19,11 +23,68 @@
 }
 .group {
   display: flex !important;
-  /* width: 50%; */
   justify-content: center !important;
   flex-direction: column !important;
 }
+.cntnTable {
+  width: 90%;
+  border-collapse: collapse;
 
+  box-shadow: 0px 0px 4px rgba(148, 133, 122, 0.8);
+}
+
+.cntnTable table {
+  width: 100%;
+  min-width: 600px;
+}
+.table-striped tbody tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-striped tbody tr td {
+  border: none !important;
+}
+.tableHeader {
+  box-shadow: #141412a9;
+  color: rgba(0, 0, 0, 0.712) !important;
+}
+.rowCentered {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
+}
+.customButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 160px !important;
+  text-align: center;
+  background-color: black !important;
+  border: 1px black !important;
+}
+.customButton:hover {
+  background-color: white !important;
+  color: black !important;
+}
+.colCentered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .rowCentered {
+    flex-direction: column;
+  }
+
+  .colCentered {
+    margin-bottom: 1px;
+  }
+}
 .buttonAdd {
   margin-right: 20px;
   background-color: black;

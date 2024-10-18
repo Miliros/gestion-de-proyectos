@@ -12,21 +12,20 @@ const Home = () => {
   return (
     <div className={styles.cntnHome}>
       <Navbar />
-      {/* <img src={home} alt="home-image" className={styles.imgHome} /> */}
       <div className={styles.cntn}>
         <div className={styles.Title}>Bienvenido/a, {user?.nombre}</div>
-      </div>
-      {isAuthenticated ? (
-        user?.rol === "admin" ? (
-          <Projects />
+        {isAuthenticated ? (
+          user?.rol === "admin" ? (
+            <Projects />
+          ) : (
+            <UserTareas />
+          )
         ) : (
-          <UserTareas />
-        )
-      ) : (
-        <div>
-          <h1>Por favor, inicia sesión</h1>
-        </div>
-      )}
+          <div>
+            <h1>Por favor, inicia sesión</h1>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
