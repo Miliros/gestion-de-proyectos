@@ -3,16 +3,31 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: red;
+  height: 100vh;
   padding: 30px;
-  width: 80%;
+  width: 100%;
   border: 1px solid black;
+  background-image: url("../Home/home.jpg");
 }
 
 .taskTitle {
-  font-size: 19px; /* Hacer el tamaño del texto más pequeño */
+  font-size: 19px;
 }
-
+.customButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px !important;
+  width: 150px !important;
+  max-width: 160px !important;
+  text-align: center;
+  background-color: black !important;
+  border: 1px black !important;
+}
+.customButton:hover {
+  background-color: rgba(90, 87, 87, 0.342) !important;
+  color: black !important;
+}
 .textSuccess {
   color: green;
   line-height: 200;

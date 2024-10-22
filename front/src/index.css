@@ -21,6 +21,10 @@ body {
 .form-check-input:checked {
   background-color: black !important;
   box-shadow: none !important;
+  border: black !important;
+}
+.form-check-input:focus {
+  box-shadow: black !important;
 }
 .modal {
   box-shadow: none !important;

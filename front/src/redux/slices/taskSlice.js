@@ -11,7 +11,7 @@ const getToken = () => {
 export const fetchAllTasks = createAsyncThunk(
   "tasks/fetchAll/all",
   async () => {
-    const response = await axios.get(API_URL, {
+    const response = await axios.get(`${API_URL}/all`, {
       headers: {
         Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
       },
@@ -56,7 +56,18 @@ export const updateTask = createAsyncThunk(
     return response.data; // Devuelve la tarea actualizada
   }
 );
-
+// Acción asíncrona para obtener las tareas por userId
+export const fetchTasksByUserId = createAsyncThunk(
+  "tasks/fetchByUserId",
+  async (userId) => {
+    const response = await axios.get(`${API_URL}/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
+      },
+    });
+    return response.data; // Devuelve las tareas del usuario
+  }
+);
 const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
@@ -98,6 +109,17 @@ const tasksSlice = createSlice({
       })
       .addCase(createTask.rejected, (state, action) => {
         state.loading = false; // Establecer loading a false
+        state.error = action.error.message; // Manejo de error
+      })
+      .addCase(fetchTasksByUserId.pending, (state) => {
+        state.loading = true; // Comienza la carga
+      })
+      .addCase(fetchTasksByUserId.fulfilled, (state, action) => {
+        state.loading = false; // Finaliza la carga
+        state.tasks = action.payload; // Guarda las tareas del usuario
+      })
+      .addCase(fetchTasksByUserId.rejected, (state, action) => {
+        state.loading = false; // Finaliza la carga
         state.error = action.error.message; // Manejo de error
       });
   },

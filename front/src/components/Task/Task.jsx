@@ -4,19 +4,20 @@ import { fetchUsers } from "../../redux/slices/userSlice";
 import {
   createTask,
   updateTask,
-  fetchTasksByProject,
+  fetchTasksByUserId,
   fetchAllTasks,
 } from "../../redux/slices/taskSlice";
-import { fetchProjects } from "../../redux/slices/projectSlice";
+import { Modal, Button } from "react-bootstrap";
 import TaskItem from "../TaskItem/TaskItem";
 import styles from "./Task.module.css";
+import { NewTaskForm } from "./NewTaskForm";
 
 const Task = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
+  const curretUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
   const tasksa = useSelector((state) => state.tasks.tasks);
-
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
     name: "",
@@ -25,6 +26,8 @@ const Task = () => {
     usuario_id: "",
     project_id: "",
   });
+  const [show, setShow] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editingTask, setEditingTask] = useState({
     name: "",
@@ -34,27 +37,24 @@ const Task = () => {
     project_id: "",
   });
 
-  // State to track the selected project
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
-  // useEffect para cargar usuarios y proyectos
   useEffect(() => {
     dispatch(fetchUsers());
-    dispatch(fetchProjects());
-    dispatch(fetchAllTasks());
-  }, [dispatch]);
 
-  // useEffect para sincronizar tareas desde Redux
-  useEffect(() => {
-    setTasks(tasksa); // Sincroniza el estado local con las tareas de Redux
-  }, [tasksa]);
-
-  // Fetch tasks by project when the selected project changes
-  useEffect(() => {
-    if (selectedProjectId) {
-      dispatch(fetchTasksByProject(selectedProjectId)); // Fetch tasks for the selected project
+    if (curretUser?.rol === "admin") {
+      // Si el usuario es admin, obtener todas las tareas
+      dispatch(fetchAllTasks());
+    } else {
+      // Si no es admin, obtener las tareas por userId
+      dispatch(fetchTasksByUserId(curretUser.id)); // Cambia esto para usar fetchTasksByUserId
     }
-  }, [dispatch, selectedProjectId]);
+  }, [dispatch, curretUser]);
+
+  useEffect(() => {
+    setTasks(tasksa);
+  }, [tasksa]);
 
   const handleAddTask = () => {
     if (newTask.name.trim()) {
@@ -66,11 +66,9 @@ const Task = () => {
         asignada_a: Number(newTask.usuario_id),
       };
 
-      console.log("Enviando al backend:", addedTask);
       dispatch(createTask(addedTask))
         .then((response) => {
-          // Manejo del éxito
-          setTasks([...tasks, response.payload]); // Asegúrate de que response.payload sea una tarea válida
+          setTasks([...tasks, response.payload]);
           setNewTask({
             name: "",
             status: "pendiente",
@@ -78,7 +76,7 @@ const Task = () => {
             usuario_id: "",
             project_id: "",
           });
-          alert("Tarea agregada correctamente");
+          handleClose(); // Cierra el modal aquí
         })
         .catch((error) => {
           console.error("Error al agregar la tarea:", error);
@@ -111,7 +109,6 @@ const Task = () => {
 
       dispatch(updateTask({ id: editingTaskId, updatedTask }))
         .then(() => {
-          // Actualiza la lista de tareas
           setTasks(
             tasks.map((task) =>
               task.id === editingTaskId ? { ...task, ...updatedTask } : task
@@ -172,113 +169,11 @@ const Task = () => {
           <div className="col col-lg-8 col-xl-6">
             <div className="card rounded-3">
               <div className="card-body p-4">
-                <h2 className={styles.taskTitle}>Nueva tarea</h2>
-                <form onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    placeholder="Tarea a realizar"
-                    value={editingTaskId ? editingTask.name : newTask.name}
-                    onChange={(e) =>
-                      editingTaskId
-                        ? setEditingTask({
-                            ...editingTask,
-                            name: e.target.value,
-                          })
-                        : setNewTask({ ...newTask, name: e.target.value })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    placeholder="Descripción"
-                    value={
-                      editingTaskId
-                        ? editingTask.description
-                        : newTask.description
-                    }
-                    onChange={(e) =>
-                      editingTaskId
-                        ? setEditingTask({
-                            ...editingTask,
-                            description: e.target.value,
-                          })
-                        : setNewTask({
-                            ...newTask,
-                            description: e.target.value,
-                          })
-                    }
-                  />
-                  <select
-                    className="form-control mb-2"
-                    value={
-                      editingTaskId
-                        ? editingTask.usuario_id
-                        : newTask.usuario_id
-                    }
-                    onChange={(e) =>
-                      editingTaskId
-                        ? setEditingTask({
-                            ...editingTask,
-                            usuario_id: e.target.value,
-                          })
-                        : setNewTask({ ...newTask, usuario_id: e.target.value })
-                    }
-                  >
-                    <option value="">Selecciona un usuario</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.nombre}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className="form-control mb-2"
-                    value={
-                      editingTaskId
-                        ? editingTask.project_id
-                        : newTask.project_id
-                    }
-                    onChange={(e) => {
-                      if (editingTaskId) {
-                        setEditingTask({
-                          ...editingTask,
-                          project_id: e.target.value,
-                        });
-                      } else {
-                        setNewTask({ ...newTask, project_id: e.target.value });
-                        setSelectedProjectId(e.target.value); // Update selected project ID
-                      }
-                    }}
-                  >
-                    <option value="">Selecciona un proyecto</option>
-                    {projects.map((project) => (
-                      <option key={project.id} value={project.id}>
-                        {project.nombre}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className="form-control mb-2"
-                    value={editingTaskId ? editingTask.status : newTask.status}
-                    onChange={(e) =>
-                      editingTaskId
-                        ? setEditingTask({
-                            ...editingTask,
-                            status: e.target.value,
-                          })
-                        : setNewTask({ ...newTask, status: e.target.value })
-                    }
-                    required
-                  >
-                    <option value="pendiente">Pendiente</option>
-                    <option value="completada">Completada</option>
-                  </select>
-
-                  <button type="submit" className={styles.buttonAdd}>
-                    {editingTaskId ? "Actualizar" : "Crear"}
-                  </button>
-                </form>
+                {curretUser?.rol === "admin" ? (
+                  <h2 className={styles.taskTitle}>Todas las tareas</h2>
+                ) : (
+                  <h2 className={styles.taskTitle}>Tus Tareas</h2>
+                )}
 
                 <hr />
 
@@ -299,10 +194,40 @@ const Task = () => {
                     ))}
                   </ul>
                 )}
+                <hr />
+                <Button
+                  className={`${styles.customButton} btn  btn-sm rounded-pill`}
+                  onClick={handleShow}
+                >
+                  Crear Tarea
+                </Button>
               </div>
             </div>
           </div>
         </div>
+        <Modal
+          show={show}
+          onHide={handleClose}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton className={styles.cntnModal}>
+            <Modal.Title>CREA UNA NUEVA TAREA</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className={styles.bodyModal}>
+            <NewTaskForm
+              newTask={newTask}
+              setNewTask={setNewTask}
+              editingTask={editingTask}
+              setEditingTask={setEditingTask}
+              editingTaskId={editingTaskId}
+              handleSubmit={handleSubmit}
+              users={users}
+              projects={projects}
+              setSelectedProjectId={setSelectedProjectId}
+            />
+          </Modal.Body>
+        </Modal>
       </div>
     </section>
   );

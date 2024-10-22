@@ -71,7 +71,7 @@
   border: 1px black !important;
 }
 .customButton:hover {
-  background-color: white !important;
+  background-color: rgba(90, 87, 87, 0.342) !important;
   color: black !important;
 }
 

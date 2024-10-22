@@ -234,7 +234,8 @@ const Projects = () => {
                       style={{ cursor: "pointer" }}
                     />
                     <MdOutlineDelete
-                      size={16}
+                      size={17}
+                      color="red"
                       onClick={() => handleShowDeleteModal(project.id)}
                       style={{ cursor: "pointer", marginLeft: 8 }}
                     />

@@ -156,3 +156,34 @@ export const getAllTasks = async (req, res) => {
     res.status(500).json({ error: "Error al obtener todas las tareas" });
   }
 };
+// Obtener tareas por userId
+export const getTasksByUserId = async (req, res) => {
+  const { userId } = req.params; // Obtener userId desde los parámetros de la solicitud
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+        t.id, 
+        t.nombre, 
+        t.descripcion, 
+        t.estado, 
+        t.proyecto_id, 
+        p.nombre AS proyecto_nombre
+       FROM tareas t
+       JOIN proyectos p ON t.proyecto_id = p.id
+       WHERE t.asignada_a = $1`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No se encontraron tareas para este usuario" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener tareas por userId:", error);
+    res.status(500).json({ error: "Error al obtener tareas por userId" });
+  }
+};

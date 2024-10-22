@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { updateTask } from "../../redux/slices/taskSlice";
+import { MdOutlineDelete } from "react-icons/md";
 import styles from "./TaskItem.module.css";
 
 const TaskItem = ({ task, users, handleDeleteTask, toggleTaskStatus }) => {
@@ -45,12 +46,9 @@ const TaskItem = ({ task, users, handleDeleteTask, toggleTaskStatus }) => {
         {users.find((user) => user.id === task.asignada_a)?.nombre}
       </strong>
       <div className="ms-auto">
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={() => handleDeleteTask(task.id)}
-        >
-          <i className="fas fa-trash-alt"></i>
-        </button>
+        <div onClick={() => handleDeleteTask(task.id)}>
+          <MdOutlineDelete size={16} color="red" />
+        </div>
       </div>
     </li>
   );
