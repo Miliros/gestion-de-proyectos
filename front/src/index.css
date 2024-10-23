@@ -41,6 +41,11 @@ body {
   box-shadow: none !important;
   border: 1px solid black !important;
 }
+.btn-group-sm > .btn,
+.btn-sm {
+  -bs-btn-padding-y: 0rem !important;
+  --bs-btn-padding-x: 0rem !important;
+}
 /* .active > form-check-input {
   background-color: black !important;
 }

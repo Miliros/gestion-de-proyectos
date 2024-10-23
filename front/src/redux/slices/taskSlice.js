@@ -4,35 +4,32 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/tasks";
 
 const getToken = () => {
-  return localStorage.getItem("token"); // Obtengo el token del localStorage
+  return localStorage.getItem("token");
 };
 
-// Acción asíncrona para obtener todas las tareas
 export const fetchAllTasks = createAsyncThunk(
   "tasks/fetchAll/all",
   async () => {
     const response = await axios.get(`${API_URL}/all`, {
       headers: {
-        Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
+        Authorization: `Bearer ${getToken()}`,
       },
     });
-    return response.data; // Asegúrate de que la respuesta sea el formato esperado
+    return response.data;
   }
 );
-// Acción asíncrona para obtener las tareas filtradas por proyecto
 export const fetchTasksByProject = createAsyncThunk(
   "tasks/fetchByProject",
   async (projectId) => {
     const response = await axios.get(`${API_URL}?project_id=${projectId}`, {
       headers: {
-        Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
+        Authorization: `Bearer ${getToken()}`,
       },
     });
-    return response.data; // Asegúrate de que la respuesta sea el formato esperado
+    return response.data;
   }
 );
 
-// Acción asíncrona para crear una nueva tarea
 export const createTask = createAsyncThunk(
   "tasks/createTask",
   async (newTask) => {
@@ -41,7 +38,7 @@ export const createTask = createAsyncThunk(
         Authorization: `Bearer ${getToken()}`,
       },
     });
-    return response.data; // Devuelve la nueva tarea creada
+    return response.data;
   }
 );
 
@@ -53,19 +50,29 @@ export const updateTask = createAsyncThunk(
         Authorization: `Bearer ${getToken()}`,
       },
     });
-    return response.data; // Devuelve la tarea actualizada
+    return response.data;
   }
 );
-// Acción asíncrona para obtener las tareas por userId
 export const fetchTasksByUserId = createAsyncThunk(
   "tasks/fetchByUserId",
   async (userId) => {
     const response = await axios.get(`${API_URL}/${userId}`, {
       headers: {
-        Authorization: `Bearer ${getToken()}`, // Agregar el token aquí
+        Authorization: `Bearer ${getToken()}`,
       },
     });
-    return response.data; // Devuelve las tareas del usuario
+    return response.data;
+  }
+);
+export const deleteTask = createAsyncThunk(
+  "tasks/deleteTask",
+  async (taskId) => {
+    await axios.delete(`${API_URL}/${taskId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return taskId; // Retornar el ID de la tarea eliminada
   }
 );
 const tasksSlice = createSlice({
@@ -79,48 +86,60 @@ const tasksSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllTasks.pending, (state) => {
-        state.loading = true; // Comienza la carga
+        state.loading = true;
       })
       .addCase(fetchAllTasks.fulfilled, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.tasks = action.payload; // Guarda todas las tareas
+        state.loading = false;
+        state.tasks = action.payload;
       })
       .addCase(fetchAllTasks.rejected, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.error = action.error.message; // Manejo de error
+        state.loading = false;
+        state.error = action.error.message;
       })
       .addCase(fetchTasksByProject.pending, (state) => {
-        state.loading = true; // Comienza la carga
+        state.loading = true;
       })
       .addCase(fetchTasksByProject.fulfilled, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.tasks = action.payload; // Guarda las tareas
+        state.loading = false;
+        state.tasks = action.payload;
       })
       .addCase(fetchTasksByProject.rejected, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.error = action.error.message; // Manejo de error
+        state.loading = false;
+        state.error = action.error.message;
       })
       .addCase(createTask.pending, (state) => {
-        state.loading = true; // Establecer loading a true durante la creación
+        state.loading = true;
       })
       .addCase(createTask.fulfilled, (state, action) => {
-        state.loading = false; // Establecer loading a false
-        state.tasks.push(action.payload); // Añadir la nueva tarea al estado
+        state.loading = false;
+        state.tasks.push(action.payload);
       })
       .addCase(createTask.rejected, (state, action) => {
-        state.loading = false; // Establecer loading a false
-        state.error = action.error.message; // Manejo de error
+        state.loading = false;
+        state.error = action.error.message;
       })
       .addCase(fetchTasksByUserId.pending, (state) => {
-        state.loading = true; // Comienza la carga
+        state.loading = true;
       })
       .addCase(fetchTasksByUserId.fulfilled, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.tasks = action.payload; // Guarda las tareas del usuario
+        state.loading = false;
+        state.tasks = action.payload;
       })
       .addCase(fetchTasksByUserId.rejected, (state, action) => {
-        state.loading = false; // Finaliza la carga
-        state.error = action.error.message; // Manejo de error
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(deleteTask.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.loading = false;
+        // Filtrar la tarea eliminada
+        state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

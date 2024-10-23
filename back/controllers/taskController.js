@@ -12,7 +12,6 @@ const pool = new Pool({
 });
 
 // Crear una nueva tarea
-// Crear una nueva tarea
 export const createTask = async (req, res) => {
   const { nombre, descripcion, estado, proyecto_id, asignada_a } = req.body;
   console.log(
@@ -72,19 +71,19 @@ export const createTask = async (req, res) => {
   }
 };
 
-// Actualizar el estado de una tarea
 export const updateTask = async (req, res) => {
   const { id } = req.params;
-  const { estado, asignada_a } = req.body;
+  const { estado, asignada_a } = req.body; // Asegúrate de que estás recibiendo el estado correctamente
+  console.log(id, estado, asignada_a);
   try {
     const result = await pool.query(
-      "UPDATE tareas SET estado = $1, asignada_a = $2 WHERE id = $3 RETURNING *", // Cambiar la consulta
-      [estado, asignada_a, id] // Asegúrate de que el orden de los parámetros es correcto
+      "UPDATE tareas SET estado = $1, asignada_a = $2 WHERE id = $3 RETURNING *",
+      [estado, asignada_a, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Tarea no encontrada" });
     }
-    res.json(result.rows[0]);
+    res.json(result.rows[0]); // Asegúrate de devolver la tarea actualizada
   } catch (error) {
     console.error("Error al actualizar tarea:", error);
     res.status(500).json({ error: "Error al actualizar tarea" });
@@ -185,5 +184,24 @@ export const getTasksByUserId = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener tareas por userId:", error);
     res.status(500).json({ error: "Error al obtener tareas por userId" });
+  }
+};
+// Eliminar una tarea por ID
+export const deleteTask = async (req, res) => {
+  const { id } = req.params; // Obtener el ID de la tarea desde los parámetros de la solicitud
+  try {
+    const result = await pool.query(
+      "DELETE FROM tareas WHERE id = $1 RETURNING *", // Eliminar la tarea y devolverla
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Tarea no encontrada" });
+    }
+
+    res.status(204).send(); // Enviar respuesta sin contenido
+  } catch (error) {
+    console.error("Error al eliminar tarea:", error);
+    res.status(500).json({ error: "Error al eliminar tarea" });
   }
 };

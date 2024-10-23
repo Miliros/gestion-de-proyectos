@@ -81,14 +81,8 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.loading = false;
-        // Evitar duplicados
-        const uniqueProjects = action.payload.filter((newProject) =>
-          state.projects.every(
-            (existingProject) => existingProject.id !== newProject.id
-          )
-        );
-        state.projects.push(...uniqueProjects); // Agregar solo proyectos únicos
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
+        state.projects = action.payload; // Actualiza el estado con proyectos nuevos
+        localStorage.setItem("projects", JSON.stringify(action.payload)); // Sincroniza con localStorage
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
@@ -99,13 +93,11 @@ const projectSlice = createSlice({
         localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
       })
       .addCase(updateProject.fulfilled, (state, action) => {
-        const index = state.projects.findIndex(
-          (project) => project.id === action.payload.id
+        const updatedProject = action.payload;
+        state.projects = state.projects.map((project) =>
+          project.id === updatedProject.id ? updatedProject : project
         );
-        if (index !== -1) {
-          state.projects[index] = { ...action.payload };
-        }
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
+        localStorage.setItem("projects", JSON.stringify(state.projects)); // Actualiza localStorage
       })
       .addCase(deleteProject.fulfilled, (state, action) => {
         state.projects = state.projects.filter(

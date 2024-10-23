@@ -2,30 +2,48 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { updateTask } from "../../redux/slices/taskSlice";
 import { MdOutlineDelete } from "react-icons/md";
+import { RiProgress2Line } from "react-icons/ri";
 import styles from "./TaskItem.module.css";
 
-const TaskItem = ({ task, users, handleDeleteTask, toggleTaskStatus }) => {
+const TaskItem = ({
+  task,
+  handleDeleteTask,
+  toggleTaskStatus,
+  toggleProcessStatus,
+}) => {
   const dispatch = useDispatch();
 
-  // Maneja el cambio del estado de la tarea
   const handleCheckboxChange = (e) => {
-    const newStatus = e.target.checked ? "completada" : "pendiente"; // Cambia el estado de la tarea
-    const asignada_a = task.asignada_a; // ID del usuario asignado
+    // Cambiar el estado según si está marcado o no
+    const newStatus = e.target.checked ? "completada" : "pendiente";
 
     const updatedTask = {
       estado: newStatus,
-      asignada_a,
+      asignada_a: task.asignada_a,
     };
 
-    // Mostrar en consola el id y los datos que se van a enviar
-    console.log("ID de la tarea:", task.id);
-    console.log("Datos que se envían al backend:", updatedTask);
+    dispatch(updateTask({ id: task.id, updatedTask }))
+      .then(() => {
+        toggleTaskStatus(task.id); // Actualiza el estado en la UI
+      })
+      .catch((error) => {
+        console.error("Error actualizando tarea:", error);
+      });
+  };
 
-    // Actualizar la tarea en el backend
-    dispatch(updateTask({ id: task.id, updatedTask }));
+  const handleSetInProgress = () => {
+    const updatedTask = {
+      estado: "en progreso",
+      asignada_a: task.asignada_a,
+    };
 
-    // Alternar el estado localmente
-    toggleTaskStatus(task.id);
+    dispatch(updateTask({ id: task.id, updatedTask }))
+      .then(() => {
+        toggleProcessStatus(task.id); // Actualiza el estado en la UI
+      })
+      .catch((error) => {
+        console.error("Error actualizando tarea:", error);
+      });
   };
 
   return (
@@ -33,21 +51,33 @@ const TaskItem = ({ task, users, handleDeleteTask, toggleTaskStatus }) => {
       <input
         className="form-check-input me-3"
         type="checkbox"
-        checked={task.estado === "completada"} // Asegúrate de que este sea el estado correcto
+        checked={task.estado === "completada"}
         onChange={handleCheckboxChange}
         aria-label="..."
       />
       {task.estado === "completada" ? (
         <span className="text-danger">{task.nombre} - Completada</span>
+      ) : task.estado === "en progreso" ? (
+        <span className="text-primary">{task.nombre} - En Progreso</span>
       ) : (
         <span className="text-success">{task.nombre} - Pendiente</span>
       )}
-      <strong className={styles.username}>
-        {users.find((user) => user.id === task.asignada_a)?.nombre}
-      </strong>
-      <div className="ms-auto">
-        <div onClick={() => handleDeleteTask(task.id)}>
-          <MdOutlineDelete size={16} color="red" />
+
+      <strong className={styles.username}>{task.usuario_nombre}</strong>
+      <div className="ms-auto d-flex align-items-center">
+        <div>
+          <RiProgress2Line
+            onClick={() => handleSetInProgress(task.id)}
+            size={16}
+            color="blue"
+            style={{ margin: "4px", cursor: "pointer" }}
+          />
+          <MdOutlineDelete
+            onClick={() => handleDeleteTask(task.id)}
+            size={16}
+            color="red"
+            style={{ cursor: "pointer" }}
+          />
         </div>
       </div>
     </li>

@@ -6,6 +6,7 @@ import {
   updateTask,
   fetchTasksByUserId,
   fetchAllTasks,
+  deleteTask,
 } from "../../redux/slices/taskSlice";
 import { Modal, Button } from "react-bootstrap";
 import TaskItem from "../TaskItem/TaskItem";
@@ -48,7 +49,7 @@ const Task = () => {
       dispatch(fetchAllTasks());
     } else {
       // Si no es admin, obtener las tareas por userId
-      dispatch(fetchTasksByUserId(curretUser.id)); // Cambia esto para usar fetchTasksByUserId
+      dispatch(fetchTasksByUserId(curretUser.id)); // x id
     }
   }, [dispatch, curretUser]);
 
@@ -57,34 +58,38 @@ const Task = () => {
   }, [tasksa]);
 
   const handleAddTask = () => {
-    if (newTask.name.trim()) {
-      const addedTask = {
-        nombre: newTask.name,
-        descripcion: newTask.description,
-        estado: newTask.status,
-        proyecto_id: Number(newTask.project_id),
-        asignada_a: Number(newTask.usuario_id),
-      };
+    const { name, description, usuario_id, project_id } = newTask;
 
-      dispatch(createTask(addedTask))
-        .then((response) => {
-          setTasks([...tasks, response.payload]);
-          setNewTask({
-            name: "",
-            status: "pendiente",
-            description: "",
-            usuario_id: "",
-            project_id: "",
-          });
-          handleClose(); // Cierra el modal aquí
-        })
-        .catch((error) => {
-          console.error("Error al agregar la tarea:", error);
-          alert("Error al agregar la tarea");
-        });
-    } else {
-      alert("Por favor ingrese un nombre para la tarea");
+    // Validar que todos los campos requeridos estén llenos
+    if (!name.trim() || !description.trim() || !usuario_id || !project_id) {
+      alert("Por favor, completa todos los campos.");
+      return;
     }
+
+    const addedTask = {
+      nombre: name,
+      descripcion: description,
+      estado: newTask.status,
+      proyecto_id: Number(project_id),
+      asignada_a: Number(usuario_id),
+    };
+
+    dispatch(createTask(addedTask))
+      .then((response) => {
+        setTasks([...tasks, response.payload]);
+        setNewTask({
+          name: "",
+          status: "pendiente",
+          description: "",
+          usuario_id: "",
+          project_id: "",
+        });
+        handleClose(); // Cierra el modal aquí
+      })
+      .catch((error) => {
+        console.error("Error al agregar la tarea:", error);
+        alert("Error al agregar la tarea");
+      });
   };
 
   const handleEditTask = (task) => {
@@ -134,32 +139,85 @@ const Task = () => {
     }
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-    alert("Tarea eliminada correctamente");
+  const handleDeleteTask = (taskId) => {
+    dispatch(deleteTask(taskId))
+      .then(() => {
+        // Aquí puedes agregar cualquier lógica adicional después de eliminar
+      })
+      .catch((error) => {
+        console.error("Error eliminando tarea:", error);
+      });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingTaskId) {
-      handleUpdateTask(); // Actualiza la tarea si está en modo edición
+      handleUpdateTask();
     } else {
-      handleAddTask(); // Agrega una nueva tarea
+      handleAddTask();
     }
   };
 
-  const toggleTaskStatus = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              estado: task.estado === "pendiente" ? "completada" : "pendiente",
-            }
-          : task
-      )
-    );
-    alert("Estado de la tarea cambiado");
+  const toggleCheckStatus = (id, currentStatus) => {
+    let newStatus;
+    if (currentStatus === "pendiente") {
+      newStatus = "completada";
+    } else if (currentStatus === "completada") {
+      newStatus = "pendiente";
+    } else if (currentStatus === "en progreso") {
+      newStatus = "completada";
+    }
+
+    const taskToUpdate = tasks.find((task) => task.id === id);
+
+    const updatedTask = {
+      ...taskToUpdate,
+      estado: newStatus,
+    };
+
+    dispatch(updateTask({ id, updatedTask }))
+      .then(() => {
+        setTasks(
+          tasks.map((task) =>
+            task.id === id ? { ...task, estado: newStatus } : task
+          )
+        );
+        alert("Estado de la tarea cambiado correctamente");
+      })
+      .catch((error) => {
+        console.error("Error al cambiar el estado de la tarea:", error);
+        alert("Hubo un error al cambiar el estado de la tarea");
+      });
+  };
+
+  const toggleProcessStatus = (id, currentStatus) => {
+    let newStatus;
+    if (currentStatus === "pendiente" || currentStatus === "completada") {
+      newStatus = "en progreso";
+    } else if (currentStatus === "en progreso") {
+      newStatus = "en progreso";
+    }
+
+    const taskToUpdate = tasks.find((task) => task.id === id);
+
+    const updatedTask = {
+      ...taskToUpdate,
+      estado: newStatus,
+    };
+
+    dispatch(updateTask({ id, updatedTask }))
+      .then(() => {
+        setTasks(
+          tasks.map((task) =>
+            task.id === id ? { ...task, estado: newStatus } : task
+          )
+        );
+        alert("Estado de la tarea cambiado correctamente");
+      })
+      .catch((error) => {
+        console.error("Error al cambiar el estado de la tarea:", error);
+        alert("Hubo un error al cambiar el estado de la tarea");
+      });
   };
 
   return (
@@ -188,7 +246,12 @@ const Task = () => {
                         users={users}
                         handleEditTask={handleEditTask}
                         handleDeleteTask={handleDeleteTask}
-                        toggleTaskStatus={toggleTaskStatus}
+                        toggleTaskStatus={() =>
+                          toggleCheckStatus(task.id, task.estado)
+                        } // Cambiar estado con check
+                        toggleProcessStatus={() =>
+                          toggleProcessStatus(task.id, task.estado)
+                        } // Cambiar estado con relojito
                         editingTaskId={editingTaskId}
                       />
                     ))}

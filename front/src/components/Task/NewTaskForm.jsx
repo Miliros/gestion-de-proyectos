@@ -105,7 +105,7 @@ export const NewTaskForm = ({
       </select>
 
       <button type="submit" className={styles.buttonAdd}>
-        {editingTaskId ? "Actualizar" : "Crear"}
+        {editingTaskId ? "Actualizar" : "Crear Tarea"}
       </button>
     </form>
   );

@@ -9,19 +9,17 @@ import {
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { FiEdit } from "react-icons/fi";
 import { MdOutlineDelete } from "react-icons/md";
-
 import styles from "./Projects.module.css";
 import Table from "react-bootstrap/Table";
 import { Modal, Button } from "react-bootstrap";
 import NewProjectForm from "./NewProjectForm";
-import Task from "../Task/Task";
 
 const Projects = () => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
   const users = useSelector((state) => state.users.users);
   const loading = useSelector((state) => state.projects.loading);
-
+  console.log(projects);
   const [newProject, setNewProject] = useState({
     nombre: "",
     descripcion: "",
@@ -49,7 +47,15 @@ const Projects = () => {
     dispatch(fetchUsers());
   }, [dispatch]);
 
-  const handleAddProject = () => {
+  const updateLocalStorage = (projects, users) => {
+    const updatedProjects = projects.map((project) => {
+      const user = users.find((user) => user.id === project.usuario_id);
+      return { ...project, usuario_nombre: user?.nombre || "No asignado" };
+    });
+    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  };
+
+  const handleAddProject = (e) => {
     const {
       nombre,
       descripcion,
@@ -57,7 +63,6 @@ const Projects = () => {
       fecha_finalizacion,
       usuario_id,
     } = newProject;
-
     if (
       nombre.trim() &&
       descripcion.trim() &&
@@ -66,7 +71,9 @@ const Projects = () => {
       usuario_id
     ) {
       dispatch(createProject(newProject)).then(() => {
-        dispatch(fetchProjects());
+        dispatch(fetchProjects()).then(() => {
+          updateLocalStorage(projects, users); // actualizo el localStorage con usuario_nombre
+        });
         setNewProject({
           nombre: "",
           descripcion: "",
@@ -97,7 +104,7 @@ const Projects = () => {
       fecha_finalizacion: project.fecha_finalizacion,
       usuario_id: project.usuario_id,
     });
-    setShowEditModal(true); // Abre el modal de edición
+    setShowEditModal(true);
   };
 
   const handleUpdateProject = () => {
@@ -123,7 +130,7 @@ const Projects = () => {
           fecha_finalizacion: "",
           usuario_id: "",
         });
-        setShowEditModal(false); // Cierra el modal de edición
+        setShowEditModal(false);
       });
     } else {
       alert("Por favor, completa todos los campos.");
@@ -150,20 +157,12 @@ const Projects = () => {
       });
     }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleAddProject();
-  };
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
   const handleCloseEdit = () => {
     setShowEditModal(false);
     setEditingProjectId(null);
   };
-
   const handleCloseDelete = () => {
     setShowDeleteModal(false);
     setProjectToDelete(null);
@@ -171,13 +170,6 @@ const Projects = () => {
 
   return (
     <section className={styles.cntnProject}>
-      {/* <div>
-        <div>Proyectos Activos</div>
-      </div>
-      <Button variant="outline-dark" onClick={handleShow}>
-        Crear Proyecto <i className="fas fa-download ms-1"></i>
-      </Button> */}
-
       {loading ? (
         <p>Cargando...</p>
       ) : (
@@ -209,44 +201,54 @@ const Projects = () => {
               </tr>
             </thead>
             <tbody>
-              {projects.map((project) => (
-                <tr key={project.id}>
-                  <td>
-                    <input
-                      className={`${styles.inputCheck} form-check-input`}
-                      type="checkbox"
-                      id={`checkbox-${project.id}`}
-                      value={project.id}
-                      aria-label="..."
-                    />
-                  </td>
-                  <td>{project.nombre}</td>
-                  <td>{project.descripcion}</td>
-                  <td>{project.usuario_nombre}</td>
-                  <td>{new Date(project.fecha_inicio).toLocaleDateString()}</td>
-                  <td>
-                    {new Date(project.fecha_finalizacion).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <FiEdit
-                      size={15}
-                      onClick={() => handleEditProject(project)} // Abre el modal de edición
-                      style={{ cursor: "pointer" }}
-                    />
-                    <MdOutlineDelete
-                      size={17}
-                      color="red"
-                      onClick={() => handleShowDeleteModal(project.id)}
-                      style={{ cursor: "pointer", marginLeft: 8 }}
-                    />
-                  </td>
+              {projects.length > 0 ? (
+                projects.map((project) => (
+                  <tr key={project.id}>
+                    <td>
+                      <input
+                        className={`${styles.inputCheck} form-check-input`}
+                        type="checkbox"
+                        id={`checkbox-${project.id}`}
+                        value={project.id}
+                        aria-label="..."
+                      />
+                    </td>
+                    <td>{project.nombre}</td>
+                    <td>{project.descripcion}</td>
+                    <td>{project.usuario_nombre || "No asignado"}</td>
+                    <td>
+                      {new Date(project.fecha_inicio).toLocaleDateString()}
+                    </td>
+                    <td>
+                      {new Date(
+                        project.fecha_finalizacion
+                      ).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <FiEdit
+                        size={15}
+                        onClick={() => handleEditProject(project)}
+                        style={{ cursor: "pointer" }}
+                      />
+                      <MdOutlineDelete
+                        size={17}
+                        color="red"
+                        onClick={() => handleShowDeleteModal(project.id)}
+                        style={{ cursor: "pointer", marginLeft: 8 }}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>No hay proyectos para mostrar</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
         </div>
       )}
-      {/* <Task /> */}
+
       {/* Modal para crear proyecto */}
       <Modal
         show={show}
@@ -262,7 +264,7 @@ const Projects = () => {
             newProject={newProject}
             users={users}
             handleChange={handleChange}
-            handleSubmit={handleSubmit}
+            handleSubmit={handleAddProject}
           />
         </Modal.Body>
       </Modal>
@@ -279,19 +281,16 @@ const Projects = () => {
         </Modal.Header>
         <Modal.Body>
           <NewProjectForm
-            newProject={editingProject} // Se pasa el proyecto en edición
+            newProject={editingProject}
             users={users}
             handleChange={handleEditChange}
-            handleSubmit={(e) => {
-              e.preventDefault();
-              handleUpdateProject();
-            }}
+            handleSubmit={handleUpdateProject}
             isEditing={true}
           />
         </Modal.Body>
       </Modal>
 
-      {/* Modal de cofirm  para eliminar proyecto */}
+      {/* Modal para eliminar proyecto */}
       <Modal
         show={showDeleteModal}
         onHide={handleCloseDelete}

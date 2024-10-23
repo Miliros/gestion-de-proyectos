@@ -1,10 +1,15 @@
 import React from "react";
 import styles from "./Projects.module.css";
 
-const NewProjectForm = ({ newProject, users, handleChange, handleSubmit }) => {
+const NewProjectForm = ({
+  newProject,
+  users,
+  handleChange,
+  handleSubmit,
+  isEditing,
+}) => {
   return (
     <section className={styles.cntnNew}>
-      {/* <h2>Nuevo proyecto</h2> */}
       <form onSubmit={handleSubmit}>
         <div>
           <input
@@ -51,7 +56,7 @@ const NewProjectForm = ({ newProject, users, handleChange, handleSubmit }) => {
             ))}
           </select>
           <button type="submit" className={styles.buttonAdd}>
-            Añadir Proyecto
+            {isEditing === true ? "Crear Proyecto" : "Editar proyecto"}
           </button>
         </div>
       </form>

@@ -65,6 +65,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 13px !important;
+  width: 150px !important;
   max-width: 160px !important;
   text-align: center;
   background-color: black !important;
@@ -92,7 +94,7 @@
   }
 
   .colCentered {
-    margin-bottom: 1px;
+    margin-bottom: 0px !important;
   }
 }
 
@@ -115,7 +117,7 @@
 .buttonDelete {
   background-color: black;
   color: white;
-  width: 120px;
+  width: 70px;
   border: 1px solid black;
   font-size: 13px !important;
 }

@@ -1,12 +1,12 @@
 .username {
-  display: block;
-  font-size: 0.8em;
+  display: flex;
+  font-size: 0.7em;
   margin-left: 0.5em;
   color: #666;
 }
-.cntnIcons {
+/* .cntnIcons {
   display: flex;
   background-color: red;
   flex-direction: row;
   justify-content: flex-end;
-}
+} */
