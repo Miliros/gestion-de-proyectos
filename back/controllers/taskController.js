@@ -74,7 +74,7 @@ export const createTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   const { id } = req.params;
   const { estado, asignada_a } = req.body; // Asegúrate de que estás recibiendo el estado correctamente
-  console.log(id, estado, asignada_a);
+  console.log("datos recibidos", id, estado, asignada_a);
   try {
     const result = await pool.query(
       "UPDATE tareas SET estado = $1, asignada_a = $2 WHERE id = $3 RETURNING *",

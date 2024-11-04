@@ -75,8 +75,8 @@ export const NewTaskForm = ({
             });
           } else {
             setNewTask({ ...newTask, project_id: e.target.value });
-            setSelectedProjectId(e.target.value); // Update selected project ID
           }
+          setSelectedProjectId(e.target.value); // Mantener proyecto seleccionado
         }}
       >
         <option value="">Selecciona un proyecto</option>
@@ -86,26 +86,8 @@ export const NewTaskForm = ({
           </option>
         ))}
       </select>
-      <select
-        className="form-control mb-2"
-        value={editingTaskId ? editingTask.status : newTask.status}
-        onChange={(e) =>
-          editingTaskId
-            ? setEditingTask({
-                ...editingTask,
-                status: e.target.value,
-              })
-            : setNewTask({ ...newTask, status: e.target.value })
-        }
-        required
-      >
-        <option value="pendiente">Pendiente</option>
-        {/* <option value="progreso">En progreso</option>
-        <option value="completada">Completada</option> */}
-      </select>
-
-      <button type="submit" className={styles.buttonAdd}>
-        {editingTaskId ? "Actualizar" : "Crear Tarea"}
+      <button type="submit" className="btn btn-primary">
+        {editingTaskId ? "Actualizar Tarea" : "Crear Tarea"}
       </button>
     </form>
   );

@@ -129,6 +129,10 @@ const tasksSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+
+      .addCase(updateTask.rejected, (state, action) => {
+        console.error(action.payload); // Log de error si algo falla
+      })
       .addCase(deleteTask.pending, (state) => {
         state.loading = true;
       })

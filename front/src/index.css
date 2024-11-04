@@ -17,7 +17,18 @@ body {
     height: 100%;
   }
 }
-
+.tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+  background-color: #ebe9e2 !important;
+  border: 1px solid rgba(0, 0, 0, 0.096) !important;
+}
+/* :root {
+  --bs-body-bg: #ebe9e2 !important;
+} */
 .form-check-input:checked {
   background-color: black !important;
   box-shadow: none !important;
@@ -46,6 +57,10 @@ body {
   -bs-btn-padding-y: 0rem !important;
   --bs-btn-padding-x: 0rem !important;
 }
+.table-bordered > :not(caption) > * > * {
+  border-width: 0px !important;
+}
+
 /* .active > form-check-input {
   background-color: black !important;
 }

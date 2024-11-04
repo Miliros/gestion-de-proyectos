@@ -9,16 +9,21 @@ import {
   deleteTask,
 } from "../../redux/slices/taskSlice";
 import { Modal, Button } from "react-bootstrap";
-import TaskItem from "../TaskItem/TaskItem";
+// import TaskItem from "../TaskItem/TaskItem";
 import styles from "./Task.module.css";
 import { NewTaskForm } from "./NewTaskForm";
+import Table from "react-bootstrap/Table";
+import { MdOutlineDelete } from "react-icons/md";
+import { RiProgress2Line } from "react-icons/ri";
 
 const Task = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
-  const curretUser = useSelector((state) => state.auth.user);
+  const currentUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
-  const tasksa = useSelector((state) => state.tasks.tasks);
+  const tasksFromStore = useSelector((state) => state.tasks.tasks);
+  const loading = useSelector((state) => state.projects.loading);
+
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
     name: "",
@@ -44,23 +49,20 @@ const Task = () => {
   useEffect(() => {
     dispatch(fetchUsers());
 
-    if (curretUser?.rol === "admin") {
-      // Si el usuario es admin, obtener todas las tareas
+    if (currentUser?.rol === "admin") {
       dispatch(fetchAllTasks());
     } else {
-      // Si no es admin, obtener las tareas por userId
-      dispatch(fetchTasksByUserId(curretUser.id)); // x id
+      dispatch(fetchTasksByUserId(currentUser.id));
     }
-  }, [dispatch, curretUser]);
+  }, [dispatch, currentUser]);
 
   useEffect(() => {
-    setTasks(tasksa);
-  }, [tasksa]);
+    setTasks(tasksFromStore);
+  }, [tasksFromStore]);
 
   const handleAddTask = () => {
     const { name, description, usuario_id, project_id } = newTask;
 
-    // Validar que todos los campos requeridos estén llenos
     if (!name.trim() || !description.trim() || !usuario_id || !project_id) {
       alert("Por favor, completa todos los campos.");
       return;
@@ -84,7 +86,7 @@ const Task = () => {
           usuario_id: "",
           project_id: "",
         });
-        handleClose(); // Cierra el modal aquí
+        handleClose();
       })
       .catch((error) => {
         console.error("Error al agregar la tarea:", error);
@@ -92,24 +94,23 @@ const Task = () => {
       });
   };
 
-  const handleEditTask = (task) => {
-    setEditingTaskId(task.id);
-    setEditingTask({
-      name: task.nombre,
-      status: task.estado,
-      description: task.descripcion,
-      usuario_id: task.asignada_a,
-      project_id: task.proyecto_id,
-    });
-  };
+  // const handleEditTask = (task) => {
+  //   setEditingTaskId(task.id);
+  //   setEditingTask({
+  //     name: task.nombre,
+  //     status: task.estado,
+  //     description: task.descripcion,
+  //     usuario_id: task.asignada_a,
+  //     project_id: task.proyecto_id,
+  //   });
+  // };
 
   const handleUpdateTask = () => {
     if (editingTask.name.trim()) {
       const updatedTask = {
         nombre: editingTask.name,
         estado: editingTask.status,
-        asignada_a: Number(editingTask.usuario_id),
-        proyecto_id: Number(editingTask.project_id),
+        asignada_a: Number(editingTask.proyecto_id),
       };
 
       dispatch(updateTask({ id: editingTaskId, updatedTask }))
@@ -142,7 +143,8 @@ const Task = () => {
   const handleDeleteTask = (taskId) => {
     dispatch(deleteTask(taskId))
       .then(() => {
-        // Aquí puedes agregar cualquier lógica adicional después de eliminar
+        setTasks(tasks.filter((task) => task.id !== taskId));
+        alert("Tarea eliminada correctamente");
       })
       .catch((error) => {
         console.error("Error eliminando tarea:", error);
@@ -158,28 +160,31 @@ const Task = () => {
     }
   };
 
-  const toggleCheckStatus = (id, currentStatus) => {
-    let newStatus;
-    if (currentStatus === "pendiente") {
-      newStatus = "completada";
-    } else if (currentStatus === "completada") {
-      newStatus = "pendiente";
-    } else if (currentStatus === "en progreso") {
-      newStatus = "completada";
+  const handleCheckboxChange = (task) => {
+    const newStatus = task.estado === "pendiente" ? "completada" : "pendiente";
+
+    // Busco  el ID del usuario correspondiente al nombre asignado
+    const assignedUser = users.find(
+      (user) => user.nombre === task.usuario_nombre
+    );
+    const assignedUserId = assignedUser ? assignedUser.id : null;
+
+    if (!assignedUserId) {
+      alert("Usuario asignado no encontrado");
+      return;
     }
 
-    const taskToUpdate = tasks.find((task) => task.id === id);
-
     const updatedTask = {
-      ...taskToUpdate,
       estado: newStatus,
+      asignada_a: assignedUserId,
     };
 
-    dispatch(updateTask({ id, updatedTask }))
-      .then(() => {
+    dispatch(updateTask({ id: task.id, updatedTask }))
+      .then((response) => {
+        const updatedTaskFromResponse = response.payload;
         setTasks(
-          tasks.map((task) =>
-            task.id === id ? { ...task, estado: newStatus } : task
+          tasks.map((t) =>
+            t.id === task.id ? { ...t, ...updatedTaskFromResponse } : t
           )
         );
         alert("Estado de la tarea cambiado correctamente");
@@ -190,108 +195,148 @@ const Task = () => {
       });
   };
 
-  const toggleProcessStatus = (id, currentStatus) => {
-    let newStatus;
-    if (currentStatus === "pendiente" || currentStatus === "completada") {
-      newStatus = "en progreso";
-    } else if (currentStatus === "en progreso") {
-      newStatus = "en progreso";
+  const handleSetInProgress = (task) => {
+    // Busco el ID del usuario correspondiente al nombre asignado
+    const assignedUser = users.find(
+      (user) => user.nombre === task.usuario_nombre
+    );
+    const assignedUserId = assignedUser ? assignedUser.id : null;
+
+    if (!assignedUserId) {
+      alert("Usuario asignado no encontrado");
+      return;
     }
 
-    const taskToUpdate = tasks.find((task) => task.id === id);
-
     const updatedTask = {
-      ...taskToUpdate,
-      estado: newStatus,
+      estado: "en progreso",
+      asignada_a: assignedUserId,
     };
 
-    dispatch(updateTask({ id, updatedTask }))
-      .then(() => {
+    dispatch(updateTask({ id: task.id, updatedTask }))
+      .then((response) => {
+        const updatedTaskFromResponse = response.payload;
         setTasks(
-          tasks.map((task) =>
-            task.id === id ? { ...task, estado: newStatus } : task
+          tasks.map((t) =>
+            t.id === task.id ? { ...t, ...updatedTaskFromResponse } : t
           )
         );
-        alert("Estado de la tarea cambiado correctamente");
+        alert("Tarea marcada como 'en progreso'");
       })
       .catch((error) => {
-        console.error("Error al cambiar el estado de la tarea:", error);
-        alert("Hubo un error al cambiar el estado de la tarea");
+        console.error("Error al actualizar tarea:", error);
+        alert("Error al actualizar tarea");
       });
   };
 
   return (
     <section className={styles.cntnTask}>
-      <div className="container py-5 h-10">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col col-lg-8 col-xl-6">
-            <div className="card rounded-3">
-              <div className="card-body p-4">
-                {curretUser?.rol === "admin" ? (
-                  <h2 className={styles.taskTitle}>Todas las tareas</h2>
-                ) : (
-                  <h2 className={styles.taskTitle}>Tus Tareas</h2>
-                )}
-
-                <hr />
-
-                {tasks.length === 0 ? (
-                  <p>No hay tareas disponibles.</p>
-                ) : (
-                  <ul className="list-group rounded-0">
-                    {tasks.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        users={users}
-                        handleEditTask={handleEditTask}
-                        handleDeleteTask={handleDeleteTask}
-                        toggleTaskStatus={() =>
-                          toggleCheckStatus(task.id, task.estado)
-                        } // Cambiar estado con check
-                        toggleProcessStatus={() =>
-                          toggleProcessStatus(task.id, task.estado)
-                        } // Cambiar estado con relojito
-                        editingTaskId={editingTaskId}
-                      />
-                    ))}
-                  </ul>
-                )}
-                <hr />
-                <Button
-                  className={`${styles.customButton} btn  btn-sm rounded-pill`}
-                  onClick={handleShow}
-                >
-                  Crear Tarea
-                </Button>
-              </div>
+      <div className={`${styles.cntnTable} table-responsive`}>
+        <div className={styles.tableTitle}>
+          <div className={`row ${styles.rowCentered}`}>
+            <div className={`col-sm-6 ${styles.colCentered}`}>
+              {currentUser?.rol === "admin" ? (
+                <h5 className={styles.taskTitle}>Todas las tareas</h5>
+              ) : (
+                <h2 className={styles.taskTitle}>Tus Tareas</h2>
+              )}
             </div>
           </div>
         </div>
-        <Modal
-          show={show}
-          onHide={handleClose}
-          backdrop="static"
-          keyboard={false}
-        >
-          <Modal.Header closeButton className={styles.cntnModal}>
-            <Modal.Title>CREA UNA NUEVA TAREA</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className={styles.bodyModal}>
-            <NewTaskForm
-              newTask={newTask}
-              setNewTask={setNewTask}
-              editingTask={editingTask}
-              setEditingTask={setEditingTask}
-              editingTaskId={editingTaskId}
-              handleSubmit={handleSubmit}
-              users={users}
-              projects={projects}
-              setSelectedProjectId={setSelectedProjectId}
-            />
-          </Modal.Body>
-        </Modal>
+
+        <Table bordered hover>
+          <thead>
+            <tr>
+              <th className={styles.tableHeader}></th>
+              <th className={styles.tableHeader}>Nombre</th>
+              <th className={styles.tableHeader}>Estado</th>
+              <th className={styles.tableHeader}>Responsable</th>
+              <th className={styles.tableHeader}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.length > 0 ? (
+              tasks.map((task) => (
+                <tr key={task.id}>
+                  <td>
+                    <input
+                      className={`${styles.inputCheck} form-check-input me-3`}
+                      type="checkbox"
+                      checked={task.estado === "completada"}
+                      onChange={() => handleCheckboxChange(task)}
+                      aria-label="..."
+                    />
+                  </td>
+                  <td className={styles.td}>{task.nombre}</td>
+                  <td className={styles.td}>
+                    {task.estado === "completada" ? (
+                      <span className="text-danger me-3">Completada</span>
+                    ) : task.estado === "en progreso" ? (
+                      <span className="text-primary me-3">En progreso</span>
+                    ) : (
+                      <span className="text-success me-3">Pendiente</span>
+                    )}
+                  </td>
+                  <td className={styles.td}>{task.usuario_nombre}</td>
+                  <td className={styles.td}>
+                    <RiProgress2Line
+                      onClick={() => handleSetInProgress(task)}
+                      size={16}
+                      color="blue"
+                      style={{ margin: "4px", cursor: "pointer" }}
+                    />
+                    <MdOutlineDelete
+                      onClick={() => handleDeleteTask(task.id)}
+                      size={16}
+                      color="red"
+                      style={{ cursor: "pointer" }}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center">
+                  No hay tareas disponibles.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
       </div>
+
+      <Button
+        className={`${styles.customButton} btn  btn-sm rounded-pill`}
+        onClick={handleShow}
+      >
+        Crear Tarea
+      </Button>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Nueva Tarea</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <NewTaskForm
+            newTask={newTask}
+            setNewTask={setNewTask}
+            editingTask={editingTask}
+            setEditingTask={setEditingTask}
+            editingTaskId={editingTaskId}
+            handleSubmit={handleSubmit}
+            users={users}
+            projects={projects}
+            setSelectedProjectId={setSelectedProjectId}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={handleAddTask}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };

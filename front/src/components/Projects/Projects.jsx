@@ -179,12 +179,6 @@ const Projects = () => {
               <div className={`col-sm-6 ${styles.colCentered}`}>
                 <h5>Proyectos activos</h5>
               </div>
-              <Button
-                className={`${styles.customButton} btn  btn-sm rounded-pill`}
-                onClick={handleShow}
-              >
-                Crear proyecto
-              </Button>
             </div>
           </div>
 
@@ -213,9 +207,11 @@ const Projects = () => {
                         aria-label="..."
                       />
                     </td>
-                    <td>{project.nombre}</td>
-                    <td>{project.descripcion}</td>
-                    <td>{project.usuario_nombre || "No asignado"}</td>
+                    <td className={styles.td}>{project.nombre}</td>
+                    <td className={styles.td}>{project.descripcion}</td>
+                    <td className={styles.td}>
+                      {project.usuario_nombre || "No asignado"}
+                    </td>
                     <td>
                       {new Date(project.fecha_inicio).toLocaleDateString()}
                     </td>
@@ -248,7 +244,12 @@ const Projects = () => {
           </Table>
         </div>
       )}
-
+      <Button
+        className={`${styles.customButton} btn  btn-sm rounded-pill`}
+        onClick={handleShow}
+      >
+        Crear proyecto
+      </Button>
       {/* Modal para crear proyecto */}
       <Modal
         show={show}
