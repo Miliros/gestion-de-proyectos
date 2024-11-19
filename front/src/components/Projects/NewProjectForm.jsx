@@ -1,4 +1,5 @@
 import React from "react";
+import { FloatingLabel, Form, Button } from "react-bootstrap";
 import styles from "./Projects.module.css";
 
 const NewProjectForm = ({
@@ -9,58 +10,97 @@ const NewProjectForm = ({
   isEditing,
 }) => {
   return (
-    <section className={styles.cntnNew}>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <input
+    <form onSubmit={handleSubmit}>
+      <div>
+        <FloatingLabel
+          controlId="floatingNombre"
+          label="Nombre del Proyecto"
+          className="mb-2 "
+        >
+          <Form.Control
             type="text"
-            className="form-control mb-1"
             placeholder="Nombre del Proyecto"
             name="nombre"
             value={newProject.nombre}
             onChange={handleChange}
           />
-          <input
+        </FloatingLabel>
+
+        <FloatingLabel
+          controlId="floatingDescripcion"
+          label="Descripción"
+          className="mb-2"
+        >
+          <Form.Control
             type="text"
-            className="form-control mb-2"
             placeholder="Descripción"
             name="descripcion"
             value={newProject.descripcion}
             onChange={handleChange}
           />
-          <input
+        </FloatingLabel>
+
+        <FloatingLabel
+          controlId="floatingFechaInicio"
+          label="Fecha de Inicio"
+          className="mb-2"
+        >
+          <Form.Control
             type="date"
-            className="form-control mb-2"
+            placeholder="Fecha de Inicio"
             name="fecha_inicio"
             value={newProject.fecha_inicio}
             onChange={handleChange}
           />
-          <input
+        </FloatingLabel>
+
+        {/* Campo de fecha para fecha de finalización */}
+        <FloatingLabel
+          controlId="floatingFechaFinalizacion"
+          label="Fecha de Finalización"
+          className="mb-2"
+        >
+          <Form.Control
             type="date"
-            className="form-control mb-2"
+            placeholder="Fecha de Finalización"
             name="fecha_finalizacion"
             value={newProject.fecha_finalizacion}
             onChange={handleChange}
           />
-          <select
-            className="form-control mb-2"
+        </FloatingLabel>
+
+        <FloatingLabel
+          controlId="floatingUsuario"
+          label="Selecciona un usuario"
+          className="mb-2"
+        >
+          <Form.Select
             name="usuario_id"
             value={newProject.usuario_id}
             onChange={handleChange}
           >
             <option value="">Selecciona un usuario</option>
             {users.map((user) => (
-              <option key={user.id} value={user.id}>
+              <option
+                key={user.id}
+                value={user.id}
+                size="sm"
+                className={styles.option}
+              >
                 {user.nombre}
               </option>
             ))}
-          </select>
-          <button type="submit" className={styles.buttonAdd}>
-            {isEditing === true ? "Crear Proyecto" : "Editar proyecto"}
-          </button>
-        </div>
-      </form>
-    </section>
+          </Form.Select>
+        </FloatingLabel>
+
+        <Button
+          type="submit"
+          className={`${styles.customButtonForm} btn  btn-sm rounded-pill`}
+        >
+          {isEditing ? "Editar Proyecto" : "Crear Proyecto"}
+        </Button>
+      </div>
+    </form>
   );
 };
 

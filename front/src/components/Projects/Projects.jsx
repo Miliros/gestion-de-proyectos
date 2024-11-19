@@ -12,12 +12,17 @@ import { MdOutlineDelete } from "react-icons/md";
 import styles from "./Projects.module.css";
 import Table from "react-bootstrap/Table";
 import { Modal, Button } from "react-bootstrap";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+
 import NewProjectForm from "./NewProjectForm";
 
 const Projects = () => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
   const users = useSelector((state) => state.users.users);
+  const currentUser = useSelector((state) => state.auth.user);
+
   const loading = useSelector((state) => state.projects.loading);
   console.log(projects);
   const [newProject, setNewProject] = useState({
@@ -170,18 +175,11 @@ const Projects = () => {
 
   return (
     <section className={styles.cntnProject}>
+      <h2 className={styles.title}>Proyectos activos</h2>
       {loading ? (
         <p>Cargando...</p>
       ) : (
         <div className={`${styles.cntnTable} table-responsive`}>
-          <div className={styles.tableTitle}>
-            <div className={`row ${styles.rowCentered}`}>
-              <div className={`col-sm-6 ${styles.colCentered}`}>
-                <h5>Proyectos activos</h5>
-              </div>
-            </div>
-          </div>
-
           <Table bordered hover>
             <thead>
               <tr>
@@ -191,7 +189,9 @@ const Projects = () => {
                 <th className={styles.tableHeader}>Responsable</th>
                 <th className={styles.tableHeader}>Inicio</th>
                 <th className={styles.tableHeader}>Finalización</th>
-                <th className={styles.tableHeader}>Acciones</th>
+                {currentUser?.rol === "admin" && (
+                  <th className={styles.tableHeader}>Acciones</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -199,13 +199,15 @@ const Projects = () => {
                 projects.map((project) => (
                   <tr key={project.id}>
                     <td>
-                      <input
-                        className={`${styles.inputCheck} form-check-input`}
-                        type="checkbox"
-                        id={`checkbox-${project.id}`}
-                        value={project.id}
-                        aria-label="..."
-                      />
+                      {users === "admin" && (
+                        <input
+                          className={`${styles.inputCheck} form-check-input`}
+                          type="checkbox"
+                          id={`checkbox-${project.id}`}
+                          value={project.id}
+                          aria-label="..."
+                        />
+                      )}
                     </td>
                     <td className={styles.td}>{project.nombre}</td>
                     <td className={styles.td}>{project.descripcion}</td>
@@ -220,19 +222,44 @@ const Projects = () => {
                         project.fecha_finalizacion
                       ).toLocaleDateString()}
                     </td>
-                    <td>
-                      <FiEdit
-                        size={15}
-                        onClick={() => handleEditProject(project)}
-                        style={{ cursor: "pointer" }}
-                      />
-                      <MdOutlineDelete
-                        size={17}
-                        color="red"
-                        onClick={() => handleShowDeleteModal(project.id)}
-                        style={{ cursor: "pointer", marginLeft: 8 }}
-                      />
-                    </td>
+                    {currentUser?.rol === "admin" && (
+                      <td>
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-edit-${project.id}`}>
+                              Editar
+                            </Tooltip>
+                          }
+                        >
+                          <span>
+                            <FiEdit
+                              size={15}
+                              onClick={() => handleEditProject(project)}
+                              style={{ cursor: "pointer" }}
+                            />
+                          </span>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-delete-${project.id}`}>
+                              Eliminar
+                            </Tooltip>
+                          }
+                        >
+                          <span>
+                            <MdOutlineDelete
+                              size={17}
+                              color="red"
+                              onClick={() => handleShowDeleteModal(project.id)}
+                              style={{ cursor: "pointer", marginLeft: 8 }}
+                            />
+                          </span>
+                        </OverlayTrigger>
+                      </td>
+                    )}
                   </tr>
                 ))
               ) : (
@@ -244,21 +271,25 @@ const Projects = () => {
           </Table>
         </div>
       )}
-      <Button
-        className={`${styles.customButton} btn  btn-sm rounded-pill`}
-        onClick={handleShow}
-      >
-        Crear proyecto
-      </Button>
-      {/* Modal para crear proyecto */}
+      {(currentUser?.rol === "admin") === "admin" && (
+        <Button
+          className={`${styles.customButton} btn  btn-sm rounded-pill`}
+          onClick={handleShow}
+        >
+          Crear proyecto
+        </Button>
+      )}
+
       <Modal
         show={show}
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
       >
-        <Modal.Header closeButton className={styles.cntnModal}>
-          <Modal.Title>CREA UN NUEVO PROYECTO</Modal.Title>
+        <Modal.Header closeButton className={styles.modalHeader}>
+          <Modal.Title className={styles.titleModal}>
+            Nuevo Proyecto
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body className={styles.bodyModal}>
           <NewProjectForm
@@ -270,7 +301,6 @@ const Projects = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Modal para editar proyecto */}
       <Modal
         show={showEditModal}
         onHide={handleCloseEdit}
@@ -291,7 +321,6 @@ const Projects = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Modal para eliminar proyecto */}
       <Modal
         show={showDeleteModal}
         onHide={handleCloseDelete}
@@ -303,12 +332,13 @@ const Projects = () => {
         </Modal.Header>
         <Modal.Body>
           ¿Estás seguro que deseas eliminar este proyecto?
-        </Modal.Body>
-        <Modal.Footer>
-          <button className={styles.buttonDelete} onClick={handleDeleteProject}>
+          <Button
+            className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
+            onClick={handleDeleteProject}
+          >
             Eliminar
-          </button>
-        </Modal.Footer>
+          </Button>
+        </Modal.Body>
       </Modal>
     </section>
   );

@@ -16,6 +16,9 @@ import Table from "react-bootstrap/Table";
 import { MdOutlineDelete } from "react-icons/md";
 import { RiProgress2Line } from "react-icons/ri";
 
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+
 const Task = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
@@ -25,6 +28,7 @@ const Task = () => {
   const loading = useSelector((state) => state.projects.loading);
 
   const [tasks, setTasks] = useState([]);
+  console.log(tasks);
   const [newTask, setNewTask] = useState({
     name: "",
     status: "pendiente",
@@ -42,9 +46,16 @@ const Task = () => {
     usuario_id: "",
     project_id: "",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const handleCloseDelete = () => {
+    setShowDeleteModal(false);
+    setProjectToDelete(null);
+  };
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -139,15 +150,25 @@ const Task = () => {
       alert("Por favor ingrese un nombre para la tarea");
     }
   };
+  const handleShowDeleteModal = (id) => {
+    setTaskToDelete(id); // Configura la tarea seleccionada
+    setShowDeleteModal(true); // Abre el modal
+  };
 
-  const handleDeleteTask = (taskId) => {
-    dispatch(deleteTask(taskId))
+  const handleDeleteTask = () => {
+    if (!taskToDelete) {
+      return; // Si no se ha asignado correctamente el ID, no hacer nada
+    }
+
+    dispatch(deleteTask(taskToDelete))
       .then(() => {
-        setTasks(tasks.filter((task) => task.id !== taskId));
+        setTasks(tasks.filter((task) => task.id !== taskToDelete));
         alert("Tarea eliminada correctamente");
+        setShowDeleteModal(false);
       })
       .catch((error) => {
         console.error("Error eliminando tarea:", error);
+        alert("Error al eliminar la tarea");
       });
   };
 
@@ -230,26 +251,22 @@ const Task = () => {
 
   return (
     <section className={styles.cntnTask}>
-      <div className={`${styles.cntnTable} table-responsive`}>
-        <div className={styles.tableTitle}>
-          <div className={`row ${styles.rowCentered}`}>
-            <div className={`col-sm-6 ${styles.colCentered}`}>
-              {currentUser?.rol === "admin" ? (
-                <h5 className={styles.taskTitle}>Todas las tareas</h5>
-              ) : (
-                <h2 className={styles.taskTitle}>Tus Tareas</h2>
-              )}
-            </div>
-          </div>
-        </div>
+      <h2 className={styles.title}>
+        {currentUser?.rol === "admin" ? "Todas las Tareas" : "Tus tareas"}
+      </h2>
 
+      <div className={`${styles.cntnTable} table-responsive`}>
         <Table bordered hover>
           <thead>
             <tr>
               <th className={styles.tableHeader}></th>
               <th className={styles.tableHeader}>Nombre</th>
               <th className={styles.tableHeader}>Estado</th>
-              <th className={styles.tableHeader}>Responsable</th>
+              {currentUser === "admin" && (
+                <th className={styles.tableHeader}>Responsable</th>
+              )}
+
+              <th className={styles.tableHeader}>Proyecto</th>
               <th className={styles.tableHeader}>Acciones</th>
             </tr>
           </thead>
@@ -258,13 +275,22 @@ const Task = () => {
               tasks.map((task) => (
                 <tr key={task.id}>
                   <td>
-                    <input
-                      className={`${styles.inputCheck} form-check-input me-3`}
-                      type="checkbox"
-                      checked={task.estado === "completada"}
-                      onChange={() => handleCheckboxChange(task)}
-                      aria-label="..."
-                    />
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-in-progress-${task.id}`}>
+                          Completada
+                        </Tooltip>
+                      }
+                    >
+                      <input
+                        className={`${styles.inputCheck} form-check-input me-3`}
+                        type="checkbox"
+                        checked={task.estado === "completada"}
+                        onChange={() => handleCheckboxChange(task)}
+                        aria-label="..."
+                      />
+                    </OverlayTrigger>
                   </td>
                   <td className={styles.td}>{task.nombre}</td>
                   <td className={styles.td}>
@@ -276,26 +302,52 @@ const Task = () => {
                       <span className="text-success me-3">Pendiente</span>
                     )}
                   </td>
-                  <td className={styles.td}>{task.usuario_nombre}</td>
+                  {users === "admin" && (
+                    <td className={styles.td}>{task.usuario_nombre}</td>
+                  )}
+                  <td className={styles.td}>{task.proyecto_nombre}</td>
                   <td className={styles.td}>
-                    <RiProgress2Line
-                      onClick={() => handleSetInProgress(task)}
-                      size={16}
-                      color="blue"
-                      style={{ margin: "4px", cursor: "pointer" }}
-                    />
-                    <MdOutlineDelete
-                      onClick={() => handleDeleteTask(task.id)}
-                      size={16}
-                      color="red"
-                      style={{ cursor: "pointer" }}
-                    />
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-in-progress-${task.id}`}>
+                          En proceso
+                        </Tooltip>
+                      }
+                    >
+                      <span>
+                        {" "}
+                        <RiProgress2Line
+                          onClick={() => handleSetInProgress(task)}
+                          size={16}
+                          color="blue"
+                          style={{ marginRight: "4px", cursor: "pointer" }}
+                        />
+                      </span>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-${task.id}`}>Eliminar</Tooltip>
+                      }
+                    >
+                      <span>
+                        {currentUser?.rol === "admin" && (
+                          <MdOutlineDelete
+                            onClick={() => handleShowDeleteModal(task.id)}
+                            size={16}
+                            color="red"
+                            style={{ cursor: "pointer" }}
+                          />
+                        )}
+                      </span>
+                    </OverlayTrigger>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center">
+                <td colSpan="6" className="text-center">
                   No hay tareas disponibles.
                 </td>
               </tr>
@@ -303,16 +355,17 @@ const Task = () => {
           </tbody>
         </Table>
       </div>
-
-      <Button
-        className={`${styles.customButton} btn  btn-sm rounded-pill`}
-        onClick={handleShow}
-      >
-        Crear Tarea
-      </Button>
+      {currentUser?.rol === "admin" && (
+        <Button
+          className={`${styles.customButton} btn  btn-sm rounded-pill`}
+          onClick={handleShow}
+        >
+          Crear Tarea
+        </Button>
+      )}
 
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className={styles.headerModal}>
           <Modal.Title>Nueva Tarea</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -328,14 +381,25 @@ const Task = () => {
             setSelectedProjectId={setSelectedProjectId}
           />
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cerrar
+      </Modal>
+      <Modal
+        show={showDeleteModal}
+        onHide={handleCloseDelete}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Eliminar Tarea</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro que deseas eliminar esta Tarea?
+          <Button
+            className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
+            onClick={handleDeleteTask}
+          >
+            Eliminar
           </Button>
-          <Button variant="primary" onClick={handleAddTask}>
-            Guardar
-          </Button>
-        </Modal.Footer>
+        </Modal.Body>
       </Modal>
     </section>
   );

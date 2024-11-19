@@ -4,19 +4,6 @@ body {
   /* padding: 2px; */
 }
 
-.bg-image-vertical {
-  /* position: relative; */
-  /* overflow: hidden; */
-  /* background-repeat: no-repeat;
-  background-position: right center;
-  background-size: auto 100%; */
-  @media (min-width: 1025px) {
-  }
-
-  .h-custom-2 {
-    height: 100%;
-  }
-}
 .tbody,
 td,
 tfoot,
@@ -39,14 +26,15 @@ tr {
 }
 .modal {
   box-shadow: none !important;
-}
-
-.modal-header .btn-close {
-  padding-right: 20px !important;
+  border-radius: 25px !important;
 }
 
 .modal-header .btn-close:focus {
   box-shadow: none !important;
+}
+.form-floating > .form-select:focus {
+  box-shadow: none !important;
+  border: 1px solid black !important;
 }
 .form-control:focus {
   box-shadow: none !important;
@@ -60,11 +48,68 @@ tr {
 .table-bordered > :not(caption) > * > * {
   border-width: 0px !important;
 }
-
-/* .active > form-check-input {
-  background-color: black !important;
+.btn-primary {
+  -mdb-btn-box-shadow: black !important;
 }
-form-check-input:focus {
-  box-shadow: none !important;
-  border: 1px solid black !important;
+
+.no-float-label .form-label {
+  position: static;
+  top: auto;
+  left: auto;
+  transform: none;
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.no-float-label .form-control:focus + .form-label,
+.no-float-label .form-control:not(:placeholder-shown) + .form-label {
+  transform: none;
+  top: auto;
+  left: auto;
+  font-size: 0.2rem;
+  color: #6c757d;
+}
+/* .modal-body {
+  padding: 0px !important;
 } */
+.modal-content {
+  max-height: 500px !important;
+}
+.bg-gradient {
+  background-color: #000;
+  background-image: radial-gradient(
+      650px circle at 0% 0%,
+      #333 15%,
+      #222 35%,
+      #111 75%,
+      #000 80%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1250px circle at 100% 100%,
+      #444 15%,
+      #333 35%,
+      #222 75%,
+      #111 80%,
+      transparent 100%
+    );
+}
+
+#radius-shape-1,
+#radius-shape-2 {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  position: absolute;
+  background: #444;
+}
+
+#radius-shape-1 {
+  top: -60px;
+  left: -130px;
+}
+
+#radius-shape-2 {
+  bottom: -60px;
+  right: -110px;
+}

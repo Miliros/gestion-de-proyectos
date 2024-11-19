@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../redux/slices/authSlice";
+import { FloatingLabel, Form } from "react-bootstrap"; // Importar FloatingLabel y Form de react-bootstrap
 import styles from "./LoginForm.module.css";
 
 import log from "../Login/log.jpg";
@@ -12,97 +13,78 @@ function LoginForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, error } = useSelector((state) => state.auth); // tomo el estado de  authSlice
+  const { loading, error } = useSelector((state) => state.auth); // Estado del authSlice
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Despacho la accion loginUser con los datos del usuario
     const result = await dispatch(loginUser({ email, password }));
     if (result.type === "auth/loginUser/fulfilled") {
-      navigate("/dashboard"); // Redirigir al dashboard si el login fue exitoso
+      navigate("/dashboard"); // Redirige si el login es exitoso
     }
   };
 
   return (
-    <section className="vh-100">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-6 text-black">
-            <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-              <form onSubmit={handleSubmit} style={{ width: "23rem" }}>
-                <h2
-                  className="fw-normal mb-3 pb-3"
-                  // style={{ letterSpacing: "1px" }}
-                >
-                  Log in
-                </h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.imageSection}>
+          <img src={log} alt="Login" className={styles.image} />
+        </div>
+        <div className={styles.formSection}>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <h1 className={styles.title}>Iniciar Sesión</h1>
 
-                {error && <p className="text-danger">{error}</p>}
+            {error && <p className={styles.error}>{error}</p>}
 
-                <div className="form-outline mb-4">
-                  <input
-                    type="email"
-                    id="form2Example18"
-                    className="form-control form-control-lg"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <label className="form-label" htmlFor="form2Example18">
-                    Email address
-                  </label>
-                </div>
+            {/* Campo de correo con FloatingLabel */}
+            <FloatingLabel
+              controlId="floatingEmail"
+              label="Correo Electrónico"
+              className="mb-3"
+            >
+              <Form.Control
+                type="email"
+                placeholder="Correo Electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </FloatingLabel>
 
-                <div className="form-outline mb-4">
-                  <input
-                    type="password"
-                    id="form2Example28"
-                    className="form-control form-control-lg"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <label className="form-label" htmlFor="form2Example28">
-                    Password
-                  </label>
-                </div>
+            {/* Campo de contraseña con FloatingLabel */}
+            <FloatingLabel
+              controlId="floatingPassword"
+              label="Contraseña"
+              className="mb-3"
+            >
+              <Form.Control
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </FloatingLabel>
 
-                <div className="pt-1 mb-4">
-                  <button
-                    className={styles.buttonLog}
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {loading ? "Cargando..." : "Login"}
-                  </button>
-                </div>
+            {/* Botón de login */}
+            <button
+              type="submit"
+              className={styles.buttonLog}
+              disabled={loading}
+            >
+              {loading ? "Cargando..." : "Ingresar"}
+            </button>
 
-                <p className="small mb-5 pb-lg-2">
-                  <a className="text-muted" href="#!">
-                    Forgot password?
-                  </a>
-                </p>
-                <p>
-                  Don't have an account?{" "}
-                  <a href="#!" className="link-info">
-                    Register here
-                  </a>
-                </p>
-              </form>
-            </div>
-          </div>
-          <div className="col-sm-6 px-0 d-none d-sm-block">
-            <img
-              src={log}
-              alt="Login image"
-              className="w-100 vh-100"
-              style={{ objectFit: "cover", objectPosition: "left" }}
-            />
-          </div>
+            {/* Enlaces */}
+            <p className={styles.link}>
+              ¿No tienes cuenta?{" "}
+              <a href="#!" className={styles.register}>
+                Regístrate
+              </a>
+            </p>
+          </form>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 

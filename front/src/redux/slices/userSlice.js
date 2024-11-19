@@ -1,12 +1,19 @@
-// src/redux/slices/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Definir la acción asíncrona para obtener los usuarios
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const response = await axios.get("http://localhost:5000/api/usuarios");
-  return response.data; // Suponiendo que el API devuelve una lista de usuarios
+  return response.data;
 });
+export const deleteUser = createAsyncThunk(
+  "users/deleteUser",
+  async (userId) => {
+    const response = await axios.delete(
+      `http://localhost:5000/api/usuarios/${userId}`
+    );
+    return userId; // Regresamos el id del usuario eliminado para actualizar el estado
+  }
+);
 
 const userSlice = createSlice({
   name: "users",
@@ -23,23 +30,31 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload; // Guarda los usuarios en el estado
+        state.users = action.payload;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; // Maneja errores
+        state.error = action.error.message;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = state.users.filter((user) => user.id !== action.payload);
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });
 
-// Exportar el selector para obtener la lista de usuarios
 export const selectUsers = (state) => state.users.users;
 export const selectLoading = (state) => state.users.loading;
 export const selectError = (state) => state.users.error;
 
-// Nuevo selector para obtener un usuario específico por ID
 export const selectUserById = (state, userId) =>
   state.users.users.find((user) => user.id === userId);
 
-// Exportar el reducer
 export default userSlice.reducer;

@@ -1,0 +1,16 @@
+.buttonLog {
+  margin-right: 20px;
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  width: 100%;
+  height: 36px;
+  font-family: satoshi;
+  border: 1px solid black;
+}
+.buttonLog:hover {
+  background-color: #b1ada2a9;
+  color: black;
+  font-weight: 600;
+  border: none;
+}

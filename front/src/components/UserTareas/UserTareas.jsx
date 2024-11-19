@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjectsByUser } from "../../redux/slices/projectSlice";
-import styles from "./UserTareas.module.css"; // Asegúrate de tener estilos si es necesario
+import styles from "../Projects/Projects.module.css"; // Asegúrate de tener estilos si es necesario
 import Table from "react-bootstrap/Table";
 
 const UserTareas = () => {
@@ -11,6 +11,7 @@ const UserTareas = () => {
     state.auth.user ? state.auth.user.id : null
   ); // Verificación para evitar error
   const dispatch = useDispatch();
+  console.log(userProjects);
 
   useEffect(() => {
     if (id) {
@@ -19,18 +20,13 @@ const UserTareas = () => {
   }, [dispatch, id]);
 
   return (
-    <section className={styles.cntnUserTareas}>
+    <section className={styles.cntnProject}>
+      <h2 className={styles.title}>Tus Proyectos activos</h2>
+
       {loading ? (
         <p>Cargando...</p>
       ) : (
         <div className={`${styles.cntnTable} table-responsive`}>
-          <div className={styles.tableTitle}>
-            <div className={`row ${styles.rowCentered}`}>
-              <div className={`col-sm-6 ${styles.colCentered}`}>
-                <h5>Tus Proyectos</h5>
-              </div>
-            </div>
-          </div>
           <Table bordered hover>
             <thead>
               <tr>

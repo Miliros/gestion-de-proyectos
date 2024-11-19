@@ -4,19 +4,14 @@
   justify-content: center;
   /* align-items: center; */
   gap: 40px; /* Espacio entre el texto y el botón */
-  height: 91.3vh;
-  background-image: url("home.jpg");
-  background-repeat: repeat-y;
-  background-size: cover;
-  background-position: 0% 0%;
-  background-attachment: fixed;
+  height: 100vh;
+  background-image: url("mii.jpeg");
 }
 .Title {
   display: flex;
   justify-content: flex-start;
   color: white;
   font-size: 30px;
-  width: 90%;
 }
 .cntn {
   display: flex;

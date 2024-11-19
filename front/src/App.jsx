@@ -6,6 +6,7 @@ import Projects from "./components/Projects/Projects";
 import Task from "./components/Task/Task";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/NavBar/NavBar";
+import User from "./components/Users/Users";
 
 function DashboardLayout({ children }) {
   return (
@@ -50,6 +51,16 @@ function App() {
             <PrivateRoute>
               <DashboardLayout>
                 <Task />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <User />
               </DashboardLayout>
             </PrivateRoute>
           }

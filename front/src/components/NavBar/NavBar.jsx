@@ -1,68 +1,62 @@
-import React from "react";
-import { logout } from "../../redux/slices/authSlice";
+import React, { useState } from "react";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { useLocation, Link } from "react-router-dom";
+import { logout } from "../../redux/slices/authSlice";
+import { useLocation, Link, NavLink } from "react-router-dom";
 import styles from "./NavBar.module.css";
 
-const Navbar = () => {
+const CustomNavbar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const [navResponsive, setNavResponsive] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary bg-transparent">
-      <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+    <Navbar
+      collapseOnSelect
+      expand="lg"
+      fixed="top"
+      className={navResponsive ? styles.navOne : styles.nav}
+    >
+      <Container fluid>
+        <Navbar.Brand href="#" className={styles.brand}>
           GESTION DE PROYECTOS
-        </a>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarTogglerDemo02"
-          aria-controls="navbarTogglerDemo02"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link active" to="/tasks">
-                Tasks
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="#">
-                Users
-              </Link>
-            </li>
-
+        </Navbar.Brand>
+        <Navbar.Toggle
+          aria-controls="responsive-navbar-nav"
+          className={styles.buttonResponsive}
+          onClick={() => setNavResponsive(!navResponsive)}
+        />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="mx-auto">
+            <Link to="/tasks" className={`nav-link ${styles.p}`}>
+              Tareas
+            </Link>
+            <Link to="/users" className={`nav-link ${styles.p}`}>
+              Usuarios
+            </Link>
             {location.pathname !== "/dashboard" && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/projects">
-                  Projects
-                </Link>
-              </li>
+              <Link to="/dashboard" className={`nav-link ${styles.p}`}>
+                Proyectos
+              </Link>
             )}
-          </ul>
-          <form className="d-flex" role="search">
-            <button
+          </Nav>
+          <Nav className="ms-auto">
+            <Button
               type="button"
               onClick={handleLogout}
-              className={styles.buttonLog}
+              className={`${styles.buttonLog} btn btn-sm rounded-pill`}
             >
               Logout
-            </button>
-          </form>
-        </div>
-      </div>
-    </nav>
+            </Button>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default CustomNavbar;
