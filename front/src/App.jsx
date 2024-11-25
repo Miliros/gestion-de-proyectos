@@ -7,6 +7,8 @@ import Task from "./components/Task/Task";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/NavBar/NavBar";
 import User from "./components/Users/Users";
+import { ToastContainer } from "react-toastify"; // Importa ToastContainer
+import "react-toastify/dist/ReactToastify.css"; // Importa estilos de react-toastify
 
 function DashboardLayout({ children }) {
   return (
@@ -66,6 +68,8 @@ function App() {
           }
         />
       </Routes>
+
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </Router>
   );
 }

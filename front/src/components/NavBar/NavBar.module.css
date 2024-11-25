@@ -7,8 +7,7 @@
   margin: 0px !important;
 }
 .navOne {
-  background-color: transparent !important;
-  background-color: #ebe9e2 !important;
+  background-color: black !important;
   padding: 13px !important;
 
   border-bottom: 1px solid black;
@@ -27,7 +26,10 @@
   margin: 8px !important;
   letter-spacing: 1px;
 }
-
+.buttonResponsive {
+  color: white !important;
+  border: 1px !important;
+}
 .buttonLog {
   display: flex;
   justify-content: center;
@@ -41,8 +43,22 @@
 }
 
 .buttonLog:hover {
-  background-color: rgba(90, 87, 87, 0.342) !important;
-  color: black !important;
-  border: 1px solid black !important;
-  font-weight: 600 !important;
+  background-color: transparent !important;
+  color: white !important;
+  border: 1px solid white !important;
+  /* font-weight: 300 !important; */
+}
+@media (max-width: 768px) {
+  .p {
+    margin: 2.5px !important;
+  }
+
+  .buttonLog {
+    width: 80px !important;
+    margin: 3.5px !important;
+    padding: 6px !important;
+    background-color: transparent !important;
+    color: white !important;
+    border: 1px solid white !important;
+  }
 }

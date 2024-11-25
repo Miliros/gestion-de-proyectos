@@ -11,20 +11,24 @@ import { FiEdit } from "react-icons/fi";
 import { MdOutlineDelete } from "react-icons/md";
 import styles from "./Projects.module.css";
 import Table from "react-bootstrap/Table";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Pagination } from "react-bootstrap";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
 import NewProjectForm from "./NewProjectForm";
 
+import { toast } from "react-toastify";
+
 const Projects = () => {
   const dispatch = useDispatch();
+
+  //redux
   const projects = useSelector((state) => state.projects.projects);
   const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
-
   const loading = useSelector((state) => state.projects.loading);
-  console.log(projects);
+
+  //estados
   const [newProject, setNewProject] = useState({
     nombre: "",
     descripcion: "",
@@ -42,16 +46,35 @@ const Projects = () => {
     usuario_id: "",
   });
 
+  //modals
   const [show, setShow] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+
+  //PAGINADO
+  const [currentPage, setCurrentPage] = useState(1);
+  const projectPerPage = 4;
+
+  const indexOfLastProject = currentPage * projectPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectPerPage;
+  const currentProjects = projects.slice(
+    indexOfFirstProject,
+    indexOfLastProject
+  );
+
+  const totalPages = Math.ceil(projects.length / projectPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   useEffect(() => {
     dispatch(fetchProjects());
     dispatch(fetchUsers());
   }, [dispatch]);
 
+  //localstorage
   const updateLocalStorage = (projects, users) => {
     const updatedProjects = projects.map((project) => {
       const user = users.find((user) => user.id === project.usuario_id);
@@ -60,7 +83,10 @@ const Projects = () => {
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
   };
 
+  // agregar proyecto
   const handleAddProject = (e) => {
+    e.preventDefault();
+
     const {
       nombre,
       descripcion,
@@ -79,6 +105,7 @@ const Projects = () => {
         dispatch(fetchProjects()).then(() => {
           updateLocalStorage(projects, users); // actualizo el localStorage con usuario_nombre
         });
+
         setNewProject({
           nombre: "",
           descripcion: "",
@@ -86,10 +113,18 @@ const Projects = () => {
           fecha_finalizacion: "",
           usuario_id: "",
         });
+
         setShow(false);
+        toast.success("Proyecto agregado con éxito.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       });
     } else {
-      alert("Por favor, completa todos los campos.");
+      toast.error("Porfavor completa todos los campos", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -112,34 +147,46 @@ const Projects = () => {
     setShowEditModal(true);
   };
 
-  const handleUpdateProject = () => {
+  const handleUpdateProject = (e) => {
+    e.preventDefault();
+
     if (
-      editingProject.nombre.trim() &&
-      editingProject.descripcion.trim() &&
-      editingProject.fecha_inicio &&
-      editingProject.fecha_finalizacion &&
-      editingProject.usuario_id
+      !editingProject.nombre.trim() ||
+      !editingProject.descripcion.trim() ||
+      !editingProject.fecha_inicio ||
+      !editingProject.fecha_finalizacion ||
+      !editingProject.usuario_id
     ) {
-      dispatch(
-        updateProject({
-          id: editingProjectId,
-          updatedProject: editingProject,
-        })
-      ).then(() => {
-        dispatch(fetchProjects());
-        setEditingProjectId(null);
-        setEditingProject({
-          nombre: "",
-          descripcion: "",
-          fecha_inicio: "",
-          fecha_finalizacion: "",
-          usuario_id: "",
-        });
-        setShowEditModal(false);
+      // Si alguna condición no se cumple, mostrar  error
+      toast.error("Por favor completa todos los campos.", {
+        position: "bottom-right",
+        autoClose: 3000,
       });
-    } else {
-      alert("Por favor, completa todos los campos.");
+      return; // no ejecuto
     }
+
+    // Si la validacion es correcta, procedo con la actualización
+    dispatch(
+      updateProject({
+        id: editingProjectId,
+        updatedProject: editingProject,
+      })
+    ).then(() => {
+      dispatch(fetchProjects());
+      setEditingProjectId(null);
+      setEditingProject({
+        nombre: "",
+        descripcion: "",
+        fecha_inicio: "",
+        fecha_finalizacion: "",
+        usuario_id: "",
+      });
+      toast.success("Proyecto editado con éxito.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      setShowEditModal(false);
+    });
   };
 
   const handleEditChange = (e) => {
@@ -159,6 +206,11 @@ const Projects = () => {
       dispatch(deleteProject(projectToDelete)).then(() => {
         dispatch(fetchProjects());
         setShowDeleteModal(false);
+
+        toast.success("Proyecto eliminado con éxito.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       });
     }
   };
@@ -174,7 +226,7 @@ const Projects = () => {
   };
 
   return (
-    <section className={styles.cntnProject}>
+    <div className={styles.cntnProject}>
       <h2 className={styles.title}>Proyectos activos</h2>
       {loading ? (
         <p>Cargando...</p>
@@ -195,8 +247,8 @@ const Projects = () => {
               </tr>
             </thead>
             <tbody>
-              {projects.length > 0 ? (
-                projects.map((project) => (
+              {currentProjects.length > 0 ? (
+                currentProjects.map((project) => (
                   <tr key={project.id}>
                     <td>
                       {users === "admin" && (
@@ -271,7 +323,31 @@ const Projects = () => {
           </Table>
         </div>
       )}
-      {(currentUser?.rol === "admin") === "admin" && (
+      <div className={styles.paginado}>
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.buttonPagination}
+          />
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === currentPage}
+              onClick={() => handlePageChange(index + 1)}
+              className={styles.buttonPagination}
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={styles.buttonPagination}
+          />
+        </Pagination>
+      </div>
+      {currentUser?.rol === "admin" && (
         <Button
           className={`${styles.customButton} btn  btn-sm rounded-pill`}
           onClick={handleShow}
@@ -284,7 +360,8 @@ const Projects = () => {
         show={show}
         onHide={handleClose}
         backdrop="static"
-        keyboard={false}
+        keyboard={true}
+        centered
       >
         <Modal.Header closeButton className={styles.modalHeader}>
           <Modal.Title className={styles.titleModal}>
@@ -305,7 +382,8 @@ const Projects = () => {
         show={showEditModal}
         onHide={handleCloseEdit}
         backdrop="static"
-        keyboard={false}
+        keyboard={true}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Editar Proyecto</Modal.Title>
@@ -325,13 +403,19 @@ const Projects = () => {
         show={showDeleteModal}
         onHide={handleCloseDelete}
         backdrop="static"
-        keyboard={false}
+        keyboard={true}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Eliminar Proyecto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro que deseas eliminar este proyecto?
+          <Button
+            className={`${styles.customButtonDeleteConfirm2} btn  btn-sm rounded-pill`}
+            onClick={handleDeleteProject}
+          >
+            Cancelar
+          </Button>
           <Button
             className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
             onClick={handleDeleteProject}
@@ -340,7 +424,7 @@ const Projects = () => {
           </Button>
         </Modal.Body>
       </Modal>
-    </section>
+    </div>
   );
 };
 

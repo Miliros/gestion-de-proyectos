@@ -11,7 +11,7 @@ export const deleteUser = createAsyncThunk(
     const response = await axios.delete(
       `http://localhost:5000/api/usuarios/${userId}`
     );
-    return userId; // Regresamos el id del usuario eliminado para actualizar el estado
+    return userId;
   }
 );
 

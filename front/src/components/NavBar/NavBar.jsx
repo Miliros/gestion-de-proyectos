@@ -44,11 +44,12 @@ const CustomNavbar = () => {
               </Link>
             )}
           </Nav>
-          <Nav className="ms-auto">
+
+          <Nav className="ms-auto d-flex align-items-center justify-content-center">
             <Button
               type="button"
               onClick={handleLogout}
-              className={`${styles.buttonLog} btn btn-sm rounded-pill`}
+              className={`${styles.buttonLog} btn btn-sm rounded-pill `}
             >
               Logout
             </Button>

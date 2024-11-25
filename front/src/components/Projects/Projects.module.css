@@ -117,11 +117,13 @@
   align-items: center;
   padding: 6px !important;
   font-size: 11.3px !important;
-  width: 150px !important;
-  max-width: 160px !important;
+  width: 85px !important;
+  max-width: 95px !important;
   text-align: center;
-  letter-spacing: 1px;
+  letter-spacing: 0.2px;
   margin-top: 25px;
+  margin-left: 15px;
+
   background-color: black !important;
   color: white;
   border: 1px solid black !important;
@@ -130,6 +132,28 @@
   background-color: white !important;
   color: black !important;
 }
+.customButtonDeleteConfirm2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px !important;
+  font-size: 11.3px !important;
+  width: 85px !important;
+  max-width: 95px !important;
+  text-align: center;
+  letter-spacing: 0.2px;
+  margin-top: 25px;
+  margin-left: 15px;
+
+  background-color: transparent !important;
+  color: black !important;
+  border: 1px solid black !important;
+}
+.customButtonDeleteConfirm2:hover {
+  background-color: black !important;
+  color: white !important;
+}
+
 .inputCheck {
   border: 1px solid black !important;
 }
@@ -161,4 +185,19 @@
 .buttonViewTasks {
   margin: 0 auto;
   display: block;
+}
+.paginado {
+  /* background-color: red !important; */
+  width: 50%;
+  display: flex !important;
+  justify-content: end !important;
+  margin-top: 8px !important;
+}
+.buttonPagination {
+  background-color: transparent !important;
+  margin: 4px !important;
+  border-radius: 100px !important;
+}
+.buttonPagination:hover {
+  background-color: rgba(255, 255, 255, 0.164) !important;
 }

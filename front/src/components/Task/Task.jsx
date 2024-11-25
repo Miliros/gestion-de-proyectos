@@ -8,25 +8,27 @@ import {
   fetchAllTasks,
   deleteTask,
 } from "../../redux/slices/taskSlice";
-import { Modal, Button } from "react-bootstrap";
-// import TaskItem from "../TaskItem/TaskItem";
+import { Modal, Button, Pagination } from "react-bootstrap";
 import styles from "./Task.module.css";
 import { NewTaskForm } from "./NewTaskForm";
 import Table from "react-bootstrap/Table";
 import { MdOutlineDelete } from "react-icons/md";
 import { RiProgress2Line } from "react-icons/ri";
+import { toast } from "react-toastify";
 
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
 const Task = () => {
   const dispatch = useDispatch();
+  //REDUX
   const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
   const tasksFromStore = useSelector((state) => state.tasks.tasks);
   const loading = useSelector((state) => state.projects.loading);
 
+  //ESTADOS
   const [tasks, setTasks] = useState([]);
   console.log(tasks);
   const [newTask, setNewTask] = useState({
@@ -46,16 +48,34 @@ const Task = () => {
     usuario_id: "",
     project_id: "",
   });
+  //MODALS
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  //
+
+  //PAGINADO
+  const [currentPage, setCurrentPage] = useState(1);
+  const tasksPerPage = 4;
+
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+
   const handleCloseDelete = () => {
     setShowDeleteModal(false);
     setProjectToDelete(null);
   };
+  const totalPages = Math.ceil(tasks.length / tasksPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  //
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -71,11 +91,16 @@ const Task = () => {
     setTasks(tasksFromStore);
   }, [tasksFromStore]);
 
+  // AGREGAR TAREA
+
   const handleAddTask = () => {
     const { name, description, usuario_id, project_id } = newTask;
 
     if (!name.trim() || !description.trim() || !usuario_id || !project_id) {
-      alert("Por favor, completa todos los campos.");
+      toast.warning("Por favor, completa todos los campos.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -98,24 +123,21 @@ const Task = () => {
           project_id: "",
         });
         handleClose();
+        toast.success("Tarea añadida con éxito.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       })
       .catch((error) => {
         console.error("Error al agregar la tarea:", error);
-        alert("Error al agregar la tarea");
+        toast.error("Error al agregar la tarea.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       });
   };
 
-  // const handleEditTask = (task) => {
-  //   setEditingTaskId(task.id);
-  //   setEditingTask({
-  //     name: task.nombre,
-  //     status: task.estado,
-  //     description: task.descripcion,
-  //     usuario_id: task.asignada_a,
-  //     project_id: task.proyecto_id,
-  //   });
-  // };
-
+  //EDITAR TAREA
   const handleUpdateTask = () => {
     if (editingTask.name.trim()) {
       const updatedTask = {
@@ -140,10 +162,8 @@ const Task = () => {
             usuario_id: "",
             project_id: "",
           });
-          alert("Tarea actualizada correctamente");
         })
         .catch((error) => {
-          console.error("Error al actualizar la tarea:", error);
           alert("Error al actualizar la tarea");
         });
     } else {
@@ -151,19 +171,23 @@ const Task = () => {
     }
   };
   const handleShowDeleteModal = (id) => {
-    setTaskToDelete(id); // Configura la tarea seleccionada
-    setShowDeleteModal(true); // Abre el modal
+    setTaskToDelete(id);
+    setShowDeleteModal(true);
   };
 
+  //ELIMINAR TAREA
   const handleDeleteTask = () => {
     if (!taskToDelete) {
-      return; // Si no se ha asignado correctamente el ID, no hacer nada
+      return;
     }
 
     dispatch(deleteTask(taskToDelete))
       .then(() => {
         setTasks(tasks.filter((task) => task.id !== taskToDelete));
-        alert("Tarea eliminada correctamente");
+        toast.error("Tarea eliminada correctamente", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
         setShowDeleteModal(false);
       })
       .catch((error) => {
@@ -171,7 +195,7 @@ const Task = () => {
         alert("Error al eliminar la tarea");
       });
   };
-
+  //CREAR TAREA
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingTaskId) {
@@ -180,18 +204,25 @@ const Task = () => {
       handleAddTask();
     }
   };
+  /// PASAR DE PENDIENTE A COMPLETADA O COMPLETADA PENDIENTE
 
   const handleCheckboxChange = (task) => {
     const newStatus = task.estado === "pendiente" ? "completada" : "pendiente";
 
-    // Busco  el ID del usuario correspondiente al nombre asignado
     const assignedUser = users.find(
       (user) => user.nombre === task.usuario_nombre
     );
     const assignedUserId = assignedUser ? assignedUser.id : null;
 
     if (!assignedUserId) {
-      alert("Usuario asignado no encontrado");
+      toast.warning("Usuario asignado no encontrado", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      toast.warning("El estado de su tarea ha cambiado", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -208,23 +239,31 @@ const Task = () => {
             t.id === task.id ? { ...t, ...updatedTaskFromResponse } : t
           )
         );
-        alert("Estado de la tarea cambiado correctamente");
+        toast.warning("El estado de su tarea ha cambiado", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       })
       .catch((error) => {
         console.error("Error al cambiar el estado de la tarea:", error);
-        alert("Hubo un error al cambiar el estado de la tarea");
+        toast.error("hubo un error al cambiar el estado de su tarea ", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       });
   };
-
+  //PASARLA A EN PROGRESO
   const handleSetInProgress = (task) => {
-    // Busco el ID del usuario correspondiente al nombre asignado
     const assignedUser = users.find(
       (user) => user.nombre === task.usuario_nombre
     );
     const assignedUserId = assignedUser ? assignedUser.id : null;
 
     if (!assignedUserId) {
-      alert("Usuario asignado no encontrado");
+      toast.warning("Usuario  no encontrado", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -241,16 +280,22 @@ const Task = () => {
             t.id === task.id ? { ...t, ...updatedTaskFromResponse } : t
           )
         );
-        alert("Tarea marcada como 'en progreso'");
+        toast.warning("Tarea marcada en progreso", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       })
       .catch((error) => {
         console.error("Error al actualizar tarea:", error);
-        alert("Error al actualizar tarea");
+        toast.error("Error al actualizar tarea", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       });
   };
 
   return (
-    <section className={styles.cntnTask}>
+    <div className={styles.cntnTask}>
       <h2 className={styles.title}>
         {currentUser?.rol === "admin" ? "Todas las Tareas" : "Tus tareas"}
       </h2>
@@ -262,7 +307,7 @@ const Task = () => {
               <th className={styles.tableHeader}></th>
               <th className={styles.tableHeader}>Nombre</th>
               <th className={styles.tableHeader}>Estado</th>
-              {currentUser === "admin" && (
+              {currentUser.rol === "admin" && (
                 <th className={styles.tableHeader}>Responsable</th>
               )}
 
@@ -271,8 +316,8 @@ const Task = () => {
             </tr>
           </thead>
           <tbody>
-            {tasks.length > 0 ? (
-              tasks.map((task) => (
+            {currentTasks.length > 0 ? (
+              currentTasks.map((task) => (
                 <tr key={task.id}>
                   <td>
                     <OverlayTrigger
@@ -302,7 +347,7 @@ const Task = () => {
                       <span className="text-success me-3">Pendiente</span>
                     )}
                   </td>
-                  {users === "admin" && (
+                  {currentUser.rol === "admin" && (
                     <td className={styles.td}>{task.usuario_nombre}</td>
                   )}
                   <td className={styles.td}>{task.proyecto_nombre}</td>
@@ -316,7 +361,6 @@ const Task = () => {
                       }
                     >
                       <span>
-                        {" "}
                         <RiProgress2Line
                           onClick={() => handleSetInProgress(task)}
                           size={16}
@@ -355,6 +399,31 @@ const Task = () => {
           </tbody>
         </Table>
       </div>
+      <div className={styles.paginado}>
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.buttonPagination}
+          />
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === currentPage}
+              onClick={() => handlePageChange(index + 1)}
+              className={styles.buttonPagination}
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={styles.buttonPagination}
+          />
+        </Pagination>
+      </div>
+
       {currentUser?.rol === "admin" && (
         <Button
           className={`${styles.customButton} btn  btn-sm rounded-pill`}
@@ -364,7 +433,7 @@ const Task = () => {
         </Button>
       )}
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton className={styles.headerModal}>
           <Modal.Title>Nueva Tarea</Modal.Title>
         </Modal.Header>
@@ -386,13 +455,19 @@ const Task = () => {
         show={showDeleteModal}
         onHide={handleCloseDelete}
         backdrop="static"
-        keyboard={false}
+        keyboard={true}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Eliminar Tarea</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro que deseas eliminar esta Tarea?
+          <Button
+            className={`${styles.customButtonDeleteConfirm2} btn  btn-sm rounded-pill`}
+            onClick={handleDeleteTask}
+          >
+            Cancelar
+          </Button>
           <Button
             className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
             onClick={handleDeleteTask}
@@ -401,7 +476,7 @@ const Task = () => {
           </Button>
         </Modal.Body>
       </Modal>
-    </section>
+    </div>
   );
 };
 

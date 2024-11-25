@@ -15,7 +15,7 @@ const User = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-
+  console.log(users, "a");
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
@@ -47,7 +47,7 @@ const User = () => {
   };
 
   return (
-    <section className={styles.cntnUser}>
+    <div className={styles.cntnUser}>
       <h2 className={styles.title}>Usuarios</h2>
 
       <div className={`${styles.cntnTable} table-responsive`}>
@@ -116,7 +116,7 @@ const User = () => {
           </Button>
         </Modal.Body>
       </Modal>
-    </section>
+    </div>
   );
 };
 

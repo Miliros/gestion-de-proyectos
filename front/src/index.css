@@ -10,7 +10,7 @@ tfoot,
 th,
 thead,
 tr {
-  background-color: #ebe9e2 !important;
+  /* background-color: #ebe9e2 !important; */
   border: 1px solid rgba(0, 0, 0, 0.096) !important;
 }
 /* :root {
@@ -73,43 +73,25 @@ tr {
   padding: 0px !important;
 } */
 .modal-content {
-  max-height: 500px !important;
+  /* padding: 15px; */
+  min-height: 160px !important;
+  max-height: 640px !important;
 }
-.bg-gradient {
-  background-color: #000;
-  background-image: radial-gradient(
-      650px circle at 0% 0%,
-      #333 15%,
-      #222 35%,
-      #111 75%,
-      #000 80%,
-      transparent 100%
-    ),
-    radial-gradient(
-      1250px circle at 100% 100%,
-      #444 15%,
-      #333 35%,
-      #222 75%,
-      #111 80%,
-      transparent 100%
-    );
+.active > .page-link,
+.page-link.active {
+  background-color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.555) !important;
+  color: black !important;
+  border-radius: 200px !important;
+  font-size: 12px !important;
 }
-
-#radius-shape-1,
-#radius-shape-2 {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  position: absolute;
-  background: #444;
+.table {
+  margin-bottom: 0px !important;
 }
-
-#radius-shape-1 {
-  top: -60px;
-  left: -130px;
-}
-
-#radius-shape-2 {
-  bottom: -60px;
-  right: -110px;
+.page-link {
+  background-color: transparent !important;
+  color: white !important;
+  border-radius: 200px !important;
+  border: 1px solid rgba(255, 255, 255, 0.555) !important;
+  font-size: 12px !important;
 }

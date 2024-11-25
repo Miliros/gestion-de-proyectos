@@ -14,15 +14,14 @@ const pool = new Pool({
 // Obtener todos los usuarios
 export const getAllUsuarios = async (req, res) => {
   try {
-    const result = await pool.query(`SELECT * FROM usuarios`); // Consulta para obtener todos los usuarios
-    res.json(result.rows); // Devuelve los resultados como JSON
+    const result = await pool.query(`SELECT * FROM usuarios`);
+    res.json(result.rows);
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 };
 
-// Eliminar un usuario por ID
 export const deleteUsuario = async (req, res) => {
   const { id } = req.params;
   try {

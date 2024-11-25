@@ -20,7 +20,7 @@ const UserTareas = () => {
   }, [dispatch, id]);
 
   return (
-    <section className={styles.cntnProject}>
+    <div className={styles.cntnProject}>
       <h2 className={styles.title}>Tus Proyectos activos</h2>
 
       {loading ? (
@@ -51,7 +51,7 @@ const UserTareas = () => {
           </Table>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
