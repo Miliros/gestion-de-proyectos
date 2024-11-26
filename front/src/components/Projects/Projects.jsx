@@ -227,11 +227,26 @@ const Projects = () => {
 
   return (
     <div className={styles.cntnProject}>
-      <h2 className={styles.title}>Proyectos activos</h2>
       {loading ? (
         <p>Cargando...</p>
       ) : (
         <div className={`${styles.cntnTable} table-responsive`}>
+          <div className={styles.titleAndButton}>
+            <p className={styles.title}>Proyectos activos</p>
+
+            <div className={styles.inputs}>
+              <i className="fa fa-search"></i>
+              <input type="text" placeholder="Buscar proyecto..." />
+            </div>
+
+            <button
+              className={`${styles.customButton} btn  btn-sm rounded-pill`}
+              onClick={handleShow}
+            >
+              + Nuevo
+            </button>
+          </div>
+
           <Table bordered hover>
             <thead>
               <tr>
@@ -321,39 +336,31 @@ const Projects = () => {
               )}
             </tbody>
           </Table>
+          <div className={styles.paginado}>
+            <Pagination>
+              <Pagination.Prev
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={styles.buttonPagination}
+              />
+              {[...Array(totalPages)].map((_, index) => (
+                <Pagination.Item
+                  key={index + 1}
+                  active={index + 1 === currentPage}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={styles.buttonPagination}
+                >
+                  {index + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={styles.buttonPagination}
+              />
+            </Pagination>
+          </div>
         </div>
-      )}
-      <div className={styles.paginado}>
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={styles.buttonPagination}
-          />
-          {[...Array(totalPages)].map((_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={index + 1 === currentPage}
-              onClick={() => handlePageChange(index + 1)}
-              className={styles.buttonPagination}
-            >
-              {index + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={styles.buttonPagination}
-          />
-        </Pagination>
-      </div>
-      {currentUser?.rol === "admin" && (
-        <Button
-          className={`${styles.customButton} btn  btn-sm rounded-pill`}
-          onClick={handleShow}
-        >
-          Crear proyecto
-        </Button>
       )}
 
       <Modal

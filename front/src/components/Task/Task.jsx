@@ -296,11 +296,26 @@ const Task = () => {
 
   return (
     <div className={styles.cntnTask}>
-      <h2 className={styles.title}>
-        {currentUser?.rol === "admin" ? "Todas las Tareas" : "Tus tareas"}
-      </h2>
-
       <div className={`${styles.cntnTable} table-responsive`}>
+        <div className={styles.titleAndButton}>
+          <p className={styles.title}>
+            {currentUser?.rol === "admin" ? "Todas las Tareas" : "Tus tareas"}
+          </p>
+
+          <div className={styles.inputs}>
+            <i className="fa fa-search"></i>
+            <input type="text" placeholder="Buscar proyecto..." />
+          </div>
+
+          {currentUser?.rol === "admin" && (
+            <Button
+              className={`${styles.customButton} btn  btn-sm rounded-pill`}
+              onClick={handleShow}
+            >
+              + Nueva
+            </Button>
+          )}
+        </div>
         <Table bordered hover>
           <thead>
             <tr>
@@ -398,40 +413,31 @@ const Task = () => {
             )}
           </tbody>
         </Table>
-      </div>
-      <div className={styles.paginado}>
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={styles.buttonPagination}
-          />
-          {[...Array(totalPages)].map((_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={index + 1 === currentPage}
-              onClick={() => handlePageChange(index + 1)}
+        <div className={styles.paginado}>
+          <Pagination>
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
               className={styles.buttonPagination}
-            >
-              {index + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={styles.buttonPagination}
-          />
-        </Pagination>
+            />
+            {[...Array(totalPages)].map((_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === currentPage}
+                onClick={() => handlePageChange(index + 1)}
+                className={styles.buttonPagination}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={styles.buttonPagination}
+            />
+          </Pagination>
+        </div>
       </div>
-
-      {currentUser?.rol === "admin" && (
-        <Button
-          className={`${styles.customButton} btn  btn-sm rounded-pill`}
-          onClick={handleShow}
-        >
-          Crear Tarea
-        </Button>
-      )}
 
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton className={styles.headerModal}>

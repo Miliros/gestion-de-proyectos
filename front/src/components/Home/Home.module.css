@@ -5,7 +5,7 @@
   /* align-items: center; */
   gap: 40px; /* Espacio entre el texto y el botón */
   height: 100vh;
-  background-image: url("mii.jpeg");
+  background-image: url("mii.jpg");
 }
 .Title {
   display: flex;

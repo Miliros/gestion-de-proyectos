@@ -79,19 +79,30 @@ tr {
 }
 .active > .page-link,
 .page-link.active {
-  background-color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.555) !important;
-  color: black !important;
+  background-color: rgb(46, 45, 45) !important;
+  border: 1px solid rgb(46, 45, 45) !important;
+  color: white !important;
   border-radius: 200px !important;
-  font-size: 12px !important;
+  font-size: 10px !important;
 }
 .table {
   margin-bottom: 0px !important;
 }
+
 .page-link {
   background-color: transparent !important;
-  color: white !important;
+  color: rgba(0, 0, 0, 0.712) !important;
   border-radius: 200px !important;
-  border: 1px solid rgba(255, 255, 255, 0.555) !important;
-  font-size: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.712) !important;
+  font-size: 10px !important;
+}
+.page-link:hover {
+  border: 1px solid black !important;
+  color: black !important;
+}
+p {
+  margin: 0px !important;
+}
+.pagination {
+  margin: 0px !important;
 }
