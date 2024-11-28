@@ -1,22 +1,48 @@
-.cntnUserTareas {
+.cntnProject {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: white;
-  padding: 30px;
+  padding: 45px;
   width: 80%;
   border: 1px solid black;
 }
-.cntnProjets {
-  justify-content: center;
-  padding: 60px;
-}
-.cntnNew {
-  height: 100vh;
+.titleAndButton {
+  display: flex;
+  justify-content: space-evenly;
   align-items: center;
-  padding: 70px;
-  background-color: #ebe9e2;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  align-content: center;
+}
+
+.inputs i {
+  color: #aaa;
+  margin-right: 8px;
+}
+
+.inputs input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+}
+.inputs {
+  display: flex;
+  align-items: center;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 20px;
+  width: 500px !important;
+  margin: 0px !important;
 }
 .narrowInputs {
   width: 350px !important;
@@ -27,10 +53,14 @@
   flex-direction: column !important;
 }
 .cntnTable {
-  width: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  width: 80%;
   border-collapse: collapse;
-
+  background-color: white !important;
   box-shadow: 0px 0px 4px rgba(148, 133, 122, 0.8);
+  border-radius: 20px !important;
 }
 
 .cntnTable table {
@@ -44,64 +74,69 @@
 .table-striped tbody tr td {
   border: none !important;
 }
-.tableHeader {
-  box-shadow: #141412a9;
-  color: rgba(0, 0, 0, 0.712) !important;
-}
-.rowCentered {
+.paginado {
   width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0;
+  display: flex !important;
+  justify-content: end !important;
+  padding: 10px 48px;
+  align-items: center !important;
+  margin: 0px !important;
 }
-.customButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 160px !important;
-  text-align: center;
-  background-color: black !important;
-  border: 1px black !important;
-}
-.customButton:hover {
-  background-color: white !important;
-  color: black !important;
-}
-.colCentered {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0;
+.buttonPagination {
+  margin: 4px !important;
 }
 
 @media (max-width: 768px) {
-  .rowCentered {
+  .titleAndButton {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    box-shadow: none;
   }
 
-  .colCentered {
-    margin-bottom: 1px;
+  .title {
+    font-size: 17px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .inputs {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .customButton {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .inputs {
+    width: 80%;
+    margin: 0 auto; /* Sigue centrado */
   }
 }
-.buttonAdd {
-  margin-right: 20px;
-  background-color: black;
-  color: white;
-  font-size: 12px;
-  width: 120px;
-  height: 36px;
-  font-family: satoshi;
-  border: 1px solid black;
-}
-.buttonAdd:hover {
-  background-color: #b1ada2a9;
-  color: black;
-  font-weight: 600;
-  border: none;
-}
-.buttonViewTasks {
-  margin: 0 auto;
-  display: block;
+
+@media (max-width: 480px) {
+  .titleAndButton {
+    box-shadow: none;
+  }
+  .title {
+    font-size: 17px;
+  }
+
+  .inputs {
+    padding: 8px;
+  }
+
+  .customButton {
+    font-size: 12px; /* Reduce el tamaño del texto del botón */
+    padding: 6px 10px; /* Ajusta el relleno del botón */
+  }
+  @media (max-width: 480px) {
+    .inputs {
+      width: 100%; /* Ocupa todo el ancho disponible */
+      margin: 0; /* Elimina márgenes */
+      padding: 8px; /* Añade un pequeño relleno para que se vea mejor */
+    }
+  }
 }

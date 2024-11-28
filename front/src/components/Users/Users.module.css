@@ -12,7 +12,7 @@
 .cntnTable {
   width: 80%;
   border-collapse: collapse;
-  background-color: #ebe9e2 !important;
+  background-color: white !important;
   /* border: 1px solid black; */
   box-shadow: 0px 0px 4px rgba(148, 133, 122, 0.8);
   border-radius: 20px !important;
@@ -25,12 +25,42 @@
 .table-striped tbody tr {
   border-bottom: 1px solid #dee2e6;
 }
-.title {
-  color: rgba(255, 255, 255, 0.733);
-  letter-spacing: 3px;
-  margin-bottom: 23px;
+.titleAndButton {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  align-content: center;
+}
+
+.inputs i {
+  color: #aaa;
+  margin-right: 8px;
+}
+
+.inputs input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+}
+.inputs {
+  display: flex;
+  align-items: center;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 20px;
+  width: 500px !important;
+  margin: 0px !important;
+}
 .table-striped tbody tr td {
   border: none !important;
   background-color: #ebe9e2 !important;
@@ -38,6 +68,7 @@
 .td {
   font-size: 14.3px !important;
 }
+
 .customButtonDeleteConfirm {
   display: flex;
   justify-content: center;
@@ -56,4 +87,58 @@
 .customButtonDeleteConfirm:hover {
   background-color: white !important;
   color: black !important;
+}
+@media (max-width: 768px) {
+  .titleAndButton {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    box-shadow: none;
+  }
+
+  .title {
+    font-size: 17px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .inputs {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .customButton {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .inputs {
+    width: 80%;
+    margin: 0 auto; /* Sigue centrado */
+  }
+}
+
+@media (max-width: 480px) {
+  .titleAndButton {
+    box-shadow: none;
+  }
+  .title {
+    font-size: 17px;
+  }
+
+  .inputs {
+    padding: 8px;
+  }
+
+  .customButton {
+    font-size: 12px; /* Reduce el tamaño del texto del botón */
+    padding: 6px 10px; /* Ajusta el relleno del botón */
+  }
+  @media (max-width: 480px) {
+    .inputs {
+      width: 100%; /* Ocupa todo el ancho disponible */
+      margin: 0; /* Elimina márgenes */
+      padding: 8px; /* Añade un pequeño relleno para que se vea mejor */
+    }
+  }
 }

@@ -48,9 +48,15 @@ const User = () => {
 
   return (
     <div className={styles.cntnUser}>
-      <h2 className={styles.title}>Usuarios</h2>
-
       <div className={`${styles.cntnTable} table-responsive`}>
+        <div className={styles.titleAndButton}>
+          <p className={styles.title}>Usuarios registrados</p>
+
+          <div className={styles.inputs}>
+            <i className="fa fa-search"></i>
+            <input type="text" placeholder="Buscar usuario..." />
+          </div>
+        </div>
         <Table bordered hover>
           <thead>
             <tr>
