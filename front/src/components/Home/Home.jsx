@@ -11,9 +11,9 @@ const Home = () => {
   return (
     <div className={styles.cntnHome}>
       <div className={styles.cntn}>
-        {/* <div className={styles.Title}>Bienvenido/a, {user?.nombre}</div> */}
         {user?.rol === "admin" ? <Projects /> : <UserTareas />}
       </div>
+      <div className={styles.Title}>Bienvenido/a, {user?.nombre}</div>
     </div>
   );
 };

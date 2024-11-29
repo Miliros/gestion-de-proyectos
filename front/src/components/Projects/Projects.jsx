@@ -24,9 +24,12 @@ const Projects = () => {
 
   //redux
   const projects = useSelector((state) => state.projects.projects);
+  console.log(projects);
   const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.projects.loading);
+  const currentPage = useSelector((state) => state.projects.currentPage);
+  const totalPages = useSelector((state) => state.projects.totalPages);
 
   //estados
   const [newProject, setNewProject] = useState({
@@ -52,27 +55,19 @@ const Projects = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
 
-  //PAGINADO
-  const [currentPage, setCurrentPage] = useState(1);
-  const projectPerPage = 4;
-
-  const indexOfLastProject = currentPage * projectPerPage;
-  const indexOfFirstProject = indexOfLastProject - projectPerPage;
-  const currentProjects = projects.slice(
-    indexOfFirstProject,
-    indexOfLastProject
-  );
-
-  const totalPages = Math.ceil(projects.length / projectPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  // Pagination
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      dispatch(fetchProjects({ page }));
+      // Asegúrate de actualizar el estado local de la página
+    }
   };
 
+  // Effects
   useEffect(() => {
-    dispatch(fetchProjects());
+    dispatch(fetchProjects({ page: currentPage }));
     dispatch(fetchUsers());
-  }, [dispatch]);
+  }, [dispatch, currentPage]);
 
   //localstorage
   const updateLocalStorage = (projects, users) => {
@@ -262,8 +257,8 @@ const Projects = () => {
               </tr>
             </thead>
             <tbody>
-              {currentProjects.length > 0 ? (
-                currentProjects.map((project) => (
+              {projects.length > 0 ? (
+                projects.map((project) => (
                   <tr key={project.id}>
                     <td>
                       {users === "admin" && (
@@ -343,14 +338,14 @@ const Projects = () => {
                 disabled={currentPage === 1}
                 className={styles.buttonPagination}
               />
-              {[...Array(totalPages)].map((_, index) => (
+              {Array.from({ length: totalPages }, (_, i) => (
                 <Pagination.Item
-                  key={index + 1}
-                  active={index + 1 === currentPage}
-                  onClick={() => handlePageChange(index + 1)}
+                  key={i + 1}
+                  active={currentPage === i + 1}
+                  onClick={() => handlePageChange(i + 1)}
                   className={styles.buttonPagination}
                 >
-                  {index + 1}
+                  {i + 1}
                 </Pagination.Item>
               ))}
               <Pagination.Next

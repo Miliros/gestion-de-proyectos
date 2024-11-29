@@ -6,72 +6,145 @@ const API_URL = "http://localhost:5000/api/projects";
 const getToken = () => {
   return localStorage.getItem("token");
 };
+// Función para manejar la redirección a login
+const redirectToLogin = (history) => {
+  history.push("/login");
+};
 
 export const fetchProjects = createAsyncThunk(
   "projects/fetchProjects",
-  async () => {
-    const response = await axios.get(API_URL, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async ({ page = 1 }, { rejectWithValue, getState }) => {
+    try {
+      const response = await axios.get(`${API_URL}?page=${page}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      // Si el error es 401 o 403, se redirige al login
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        redirectToLogin(getState().history);
+      }
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
+// Acción para crear un proyecto
 export const createProject = createAsyncThunk(
   "projects/createProject",
-  async (newProject) => {
-    const response = await axios.post(API_URL, newProject, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async (newProject, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(API_URL, newProject, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        redirectToLogin(); // Redirigir al login si el token no es válido
+      }
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
+// Acción para actualizar un proyecto
 export const updateProject = createAsyncThunk(
   "projects/updateProject",
-  async ({ id, updatedProject }) => {
-    const response = await axios.put(`${API_URL}/${id}`, updatedProject, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async ({ id, updatedProject }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${API_URL}/${id}`, updatedProject, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        redirectToLogin();
+      }
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
+// Acción para eliminar un proyecto
 export const deleteProject = createAsyncThunk(
   "projects/deleteProject",
-  async (id) => {
-    await axios.delete(`${API_URL}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return id;
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return id;
+    } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        redirectToLogin();
+      }
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
 // Obtener proyectos por userId
 export const fetchProjectsByUser = createAsyncThunk(
   "projects/fetchProjectsByUser",
-  async (userId) => {
-    const response = await axios.get(`${API_URL}/usuario/${userId}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/usuario/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        redirectToLogin();
+      }
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
 const projectSlice = createSlice({
   name: "projects",
   initialState: {
-    projects: JSON.parse(localStorage.getItem("projects")) || [],
+    projects: [],
     loading: false,
     error: null,
+    totalPages: 1,
+    currentPage: 1,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -81,8 +154,9 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects = action.payload; // Actualiza el estado con proyectos nuevos
-        localStorage.setItem("projects", JSON.stringify(action.payload)); // Sincroniza con localStorage
+        state.projects = action.payload.projects;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
@@ -104,27 +178,8 @@ const projectSlice = createSlice({
           (project) => project.id !== action.payload
         );
         localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
-      })
-      .addCase(fetchProjectsByUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchProjectsByUser.fulfilled, (state, action) => {
-        state.loading = false;
-        // Evitar duplicados
-        const uniqueProjects = action.payload.filter((newProject) =>
-          state.projects.every(
-            (existingProject) => existingProject.id !== newProject.id
-          )
-        );
-        state.projects.push(...uniqueProjects); // Agregar solo proyectos únicos
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
-      })
-      .addCase(fetchProjectsByUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
       });
   },
 });
 
-// Exportar el reducer
 export default projectSlice.reducer;

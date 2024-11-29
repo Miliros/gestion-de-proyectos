@@ -11,26 +11,57 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Obtener todos los proyectos
 export const getAllProjects = async (req, res) => {
+  let page = parseInt(req.query.page) || 1; // Página por defecto = 1
+  const limit = 7; // Número de elementos por página
+
+  // Asegurarse de que la página solicitada no sea menor que 1
+  if (page < 1) {
+    return res
+      .status(400)
+      .json({ error: "La página debe ser mayor o igual a 1" });
+  }
+
+  const offset = (page - 1) * limit;
+
   try {
-    const result = await pool.query(`
-      SELECT 
+    const totalResult = await pool.query(`SELECT COUNT(*) FROM proyectos`);
+    const totalProjects = parseInt(totalResult.rows[0].count, 10); // Total de proyectos
+
+    const totalPages = Math.ceil(totalProjects / limit);
+
+    if (page > totalPages) {
+      return res.status(404).json({ error: "Página fuera de rango" });
+    }
+
+    console.log(`Limit: ${limit}, Offset: ${offset}`);
+
+    const result = await pool.query(
+      `SELECT 
         p.id, 
         p.nombre, 
         p.descripcion, 
         p.fecha_inicio, 
         p.fecha_finalizacion, 
-        u.nombre AS usuario_nombre  -- Obtiene el nombre del usuario
+        u.nombre AS usuario_nombre
       FROM proyectos p
-      JOIN usuarios u ON p.usuario_id = u.id  -- Realiza el JOIN
-    `);
-    res.json(result.rows);
+      JOIN usuarios u ON p.usuario_id = u.id
+      LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+
+    res.json({
+      projects: result.rows,
+      totalProjects, // Total de proyectos
+      totalPages, // Total de páginas disponibles
+      currentPage: page, // Página actual
+    });
   } catch (error) {
-    console.error("Error al obtener proyectos:", error);
+    console.error("Error al obtener proyectos paginados:", error);
     res.status(500).json({ error: "Error al obtener proyectos" });
   }
 };
+
 // Obtener un proyecto por ID
 export const getProjectById = async (req, res) => {
   const { id } = req.params;
