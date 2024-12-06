@@ -26,6 +26,9 @@ const Task = () => {
   const currentUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
   const tasksFromStore = useSelector((state) => state.tasks.tasks);
+  const currentPage = useSelector((state) => state.tasks.currentPage);
+  const totalPages = useSelector((state) => state.tasks.totalPages);
+
   const loading = useSelector((state) => state.projects.loading);
 
   //ESTADOS
@@ -52,27 +55,25 @@ const Task = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
 
+  const [search, setSearch] = useState("");
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   //
 
   //PAGINADO
-  const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 4;
-
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
 
   const handleCloseDelete = () => {
     setShowDeleteModal(false);
     setProjectToDelete(null);
   };
-  const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      dispatch(fetchAllTasks({ page }));
+      // Asegúrate de actualizar el estado local de la página
+    }
   };
 
   //
@@ -81,13 +82,14 @@ const Task = () => {
     dispatch(fetchUsers());
 
     if (currentUser?.rol === "admin") {
-      dispatch(fetchAllTasks());
+      dispatch(fetchAllTasks({ page: currentPage }));
     } else {
       dispatch(fetchTasksByUserId(currentUser.id));
     }
-  }, [dispatch, currentUser]);
+  }, [dispatch, currentUser, currentPage]);
 
   useEffect(() => {
+    console.log("Tareas desde la store", tasksFromStore); // Verifica si las tareas llegan
     setTasks(tasksFromStore);
   }, [tasksFromStore]);
 
@@ -304,7 +306,35 @@ const Task = () => {
 
           <div className={styles.inputs}>
             <i className="fa fa-search"></i>
-            <input type="text" placeholder="Buscar proyecto..." />
+            <input
+              type="text"
+              placeholder="Buscar proyecto..."
+              value={search}
+              onChange={(e) => {
+                e.preventDefault();
+                const searchTerm = e.target.value.trim();
+                setSearch(searchTerm);
+
+                if (searchTerm === "") {
+                  // Si el input está vacío, carga todos los proyectos normales
+                  dispatch(fetchAllTasks({ page: 1 }));
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+
+                  const searchTerm = search.trim();
+                  if (searchTerm) {
+                    // Busco con el término ingresado
+                    dispatch(fetchAllTasks({ page: 1, search: searchTerm }));
+                  } else {
+                    // Si no hay término, recarga los proyectos normales
+                    dispatch(fetchAllTasks({ page: 1 }));
+                  }
+                }
+              }}
+            />
           </div>
 
           {currentUser?.rol === "admin" && (
@@ -331,8 +361,8 @@ const Task = () => {
             </tr>
           </thead>
           <tbody>
-            {currentTasks.length > 0 ? (
-              currentTasks.map((task) => (
+            {tasks.length > 0 ? (
+              tasks.map((task) => (
                 <tr key={task.id}>
                   <td>
                     <OverlayTrigger
@@ -420,14 +450,14 @@ const Task = () => {
               disabled={currentPage === 1}
               className={styles.buttonPagination}
             />
-            {[...Array(totalPages)].map((_, index) => (
+            {Array.from({ length: totalPages }, (_, i) => (
               <Pagination.Item
-                key={index + 1}
-                active={index + 1 === currentPage}
-                onClick={() => handlePageChange(index + 1)}
+                key={i + 1}
+                active={currentPage === i + 1}
+                onClick={() => handlePageChange(i + 1)}
                 className={styles.buttonPagination}
               >
-                {index + 1}
+                {i + 1}
               </Pagination.Item>
             ))}
             <Pagination.Next

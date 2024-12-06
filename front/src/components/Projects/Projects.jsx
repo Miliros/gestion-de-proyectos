@@ -18,13 +18,13 @@ import Tooltip from "react-bootstrap/Tooltip";
 import NewProjectForm from "./NewProjectForm";
 
 import { toast } from "react-toastify";
+import _ from "lodash";
 
 const Projects = () => {
   const dispatch = useDispatch();
 
   //redux
   const projects = useSelector((state) => state.projects.projects);
-  console.log(projects);
   const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.projects.loading);
@@ -54,6 +54,8 @@ const Projects = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+
+  const [search, setSearch] = useState("");
 
   // Pagination
   const handlePageChange = (page) => {
@@ -199,7 +201,7 @@ const Projects = () => {
   const handleDeleteProject = () => {
     if (projectToDelete) {
       dispatch(deleteProject(projectToDelete)).then(() => {
-        dispatch(fetchProjects());
+        dispatch(fetchProjects({ page: 1 }));
         setShowDeleteModal(false);
 
         toast.success("Proyecto eliminado con éxito.", {
@@ -231,7 +233,35 @@ const Projects = () => {
 
             <div className={styles.inputs}>
               <i className="fa fa-search"></i>
-              <input type="text" placeholder="Buscar proyecto..." />
+              <input
+                type="text"
+                placeholder="Buscar proyecto..."
+                value={search}
+                onChange={(e) => {
+                  e.preventDefault();
+                  const searchTerm = e.target.value.trim();
+                  setSearch(searchTerm);
+
+                  if (searchTerm === "") {
+                    // Si el input está vacío, carga todos los proyectos normales
+                    dispatch(fetchProjects({ page: 1 }));
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    const searchTerm = search.trim();
+                    if (searchTerm) {
+                      // Busco con el término ingresado
+                      dispatch(fetchProjects({ page: 1, search: searchTerm }));
+                    } else {
+                      // Si no hay término, recarga los proyectos normales
+                      dispatch(fetchProjects({ page: 1 }));
+                    }
+                  }
+                }}
+              />
             </div>
 
             <button

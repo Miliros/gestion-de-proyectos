@@ -14,6 +14,7 @@ const pool = new Pool({
 export const getAllProjects = async (req, res) => {
   let page = parseInt(req.query.page) || 1; // Página por defecto = 1
   const limit = 7; // Número de elementos por página
+  const search = req.query.search || ""; // Parámetro de búsqueda (por nombre)
 
   // Asegurarse de que la página solicitada no sea menor que 1
   if (page < 1) {
@@ -25,8 +26,12 @@ export const getAllProjects = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    const totalResult = await pool.query(`SELECT COUNT(*) FROM proyectos`);
-    const totalProjects = parseInt(totalResult.rows[0].count, 10); // Total de proyectos
+    // Contamos los proyectos que coinciden con la búsqueda
+    const totalResult = await pool.query(
+      `SELECT COUNT(*) FROM proyectos WHERE nombre ILIKE $1`,
+      [`%${search}%`] // Filtramos por nombre (case-insensitive)
+    );
+    const totalProjects = parseInt(totalResult.rows[0].count, 10); // Total de proyectos filtrados
 
     const totalPages = Math.ceil(totalProjects / limit);
 
@@ -34,8 +39,9 @@ export const getAllProjects = async (req, res) => {
       return res.status(404).json({ error: "Página fuera de rango" });
     }
 
-    console.log(`Limit: ${limit}, Offset: ${offset}`);
+    console.log(`Limit: ${limit}, Offset: ${offset}, Search: ${search}`);
 
+    // Consultamos los proyectos filtrados por nombre
     const result = await pool.query(
       `SELECT 
         p.id, 
@@ -46,18 +52,19 @@ export const getAllProjects = async (req, res) => {
         u.nombre AS usuario_nombre
       FROM proyectos p
       JOIN usuarios u ON p.usuario_id = u.id
-      LIMIT $1 OFFSET $2`,
-      [limit, offset]
+      WHERE p.nombre ILIKE $1
+      LIMIT $2 OFFSET $3`,
+      [`%${search}%`, limit, offset]
     );
 
     res.json({
       projects: result.rows,
-      totalProjects, // Total de proyectos
+      totalProjects, // Total de proyectos filtrados
       totalPages, // Total de páginas disponibles
       currentPage: page, // Página actual
     });
   } catch (error) {
-    console.error("Error al obtener proyectos paginados:", error);
+    console.error("Error al obtener proyectos filtrados:", error);
     res.status(500).json({ error: "Error al obtener proyectos" });
   }
 };

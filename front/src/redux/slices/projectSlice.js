@@ -13,13 +13,17 @@ const redirectToLogin = (history) => {
 
 export const fetchProjects = createAsyncThunk(
   "projects/fetchProjects",
-  async ({ page = 1 }, { rejectWithValue, getState }) => {
+  async ({ page = 1, search = "" }, { rejectWithValue, getState }) => {
+    // Añadir search como parámetro
     try {
-      const response = await axios.get(`${API_URL}?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      const response = await axios.get(
+        `${API_URL}?page=${page}&search=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
 
       return response.data;
     } catch (error) {
@@ -145,6 +149,7 @@ const projectSlice = createSlice({
     error: null,
     totalPages: 1,
     currentPage: 1,
+    search: "",
   },
   reducers: {},
   extraReducers: (builder) => {

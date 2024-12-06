@@ -8,16 +8,26 @@ const getToken = () => {
 };
 
 export const fetchAllTasks = createAsyncThunk(
-  "tasks/fetchAll/all",
-  async () => {
-    const response = await axios.get(`${API_URL}/all`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  "tasks/fetchAllTasks",
+  async ({ page = 1, search = "" }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/all?page=${page}&search=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+      return response.data; // Asegúrate de que el backend devuelva los datos correctamente
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
+
 export const fetchTasksByProject = createAsyncThunk(
   "tasks/fetchByProject",
   async (projectId) => {
@@ -81,6 +91,9 @@ const tasksSlice = createSlice({
     tasks: [],
     loading: false,
     error: null,
+    totalPages: 1,
+    currentPage: 1,
+    search: "",
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -90,7 +103,9 @@ const tasksSlice = createSlice({
       })
       .addCase(fetchAllTasks.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks = action.payload;
+        state.tasks = action.payload.tasks; // Asumiendo que el backend devuelve una propiedad 'tasks'
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchAllTasks.rejected, (state, action) => {
         state.loading = false;

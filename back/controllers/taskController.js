@@ -128,9 +128,36 @@ export const getTasksByProject = async (req, res) => {
     res.status(500).json({ error: "Error al obtener tareas" });
   }
 };
-// Obtener todas las tareas
+// Obtener todas las tareas con paginado y búsqueda
 export const getAllTasks = async (req, res) => {
+  let page = parseInt(req.query.page) || 1; // Página por defecto = 1
+  const limit = 7; // Número de elementos por página
+  const search = req.query.search || ""; // Parámetro de búsqueda (por nombre)
+
+  // Asegurarse de que la página solicitada no sea menor que 1
+  if (page < 1) {
+    return res
+      .status(400)
+      .json({ error: "La página debe ser mayor o igual a 1" });
+  }
+
+  const offset = (page - 1) * limit;
+
   try {
+    // Contamos las tareas que coinciden con la búsqueda
+    const totalResult = await pool.query(
+      `SELECT COUNT(*) FROM tareas WHERE nombre ILIKE $1`,
+      [`%${search}%`] // Filtramos por nombre (case-insensitive)
+    );
+    const totalTasks = parseInt(totalResult.rows[0].count, 10); // Total de tareas filtradas
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    if (page > totalPages) {
+      return res.status(404).json({ error: "Página fuera de rango" });
+    }
+
+    // Consultamos las tareas filtradas por nombre
     const result = await pool.query(
       `SELECT 
         t.id, 
@@ -142,19 +169,24 @@ export const getAllTasks = async (req, res) => {
         p.nombre AS proyecto_nombre
       FROM tareas t
       JOIN usuarios u ON t.asignada_a = u.id
-      JOIN proyectos p ON t.proyecto_id = p.id`
+      JOIN proyectos p ON t.proyecto_id = p.id
+      WHERE t.nombre ILIKE $1
+      LIMIT $2 OFFSET $3`,
+      [`%${search}%`, limit, offset]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "No se encontraron tareas" });
-    }
-
-    res.json(result.rows);
+    res.json({
+      tasks: result.rows,
+      totalTasks, // Total de tareas filtradas
+      totalPages, // Total de páginas disponibles
+      currentPage: page, // Página actual
+    });
   } catch (error) {
-    console.error("Error al obtener todas las tareas:", error);
-    res.status(500).json({ error: "Error al obtener todas las tareas" });
+    console.error("Error al obtener tareas filtradas:", error);
+    res.status(500).json({ error: "Error al obtener tareas" });
   }
 };
+
 // Obtener tareas por userId
 export const getTasksByUserId = async (req, res) => {
   const { userId } = req.params; // Obtener userId desde los parámetros de la solicitud
