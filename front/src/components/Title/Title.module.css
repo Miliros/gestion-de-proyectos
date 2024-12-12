@@ -1,0 +1,29 @@
+.CntText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 80%;
+  margin-bottom: 10px;
+}
+
+.text {
+  color: white;
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  font-weight: 400;
+  text-align: right;
+}
+
+.textUser {
+  color: white;
+  font-size: 15px;
+  font-weight: 300;
+  text-align: right;
+  letter-spacing: 1px;
+  margin: 0px;
+}
+
+.span {
+  color: #b8d85c;
+  margin-left: 8px;
+}

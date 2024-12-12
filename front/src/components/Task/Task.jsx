@@ -19,6 +19,8 @@ import { toast } from "react-toastify";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
+import Title from "../Title/Title";
+
 const Task = () => {
   const dispatch = useDispatch();
   //REDUX
@@ -298,176 +300,189 @@ const Task = () => {
 
   return (
     <div className={styles.cntnTask}>
-      <div className={`${styles.cntnTable} table-responsive`}>
-        <div className={styles.titleAndButton}>
-          <p className={styles.title}>
-            {currentUser?.rol === "admin" ? "Todas las Tareas" : "Tus tareas"}
-          </p>
+      {loading ? (
+        <p>Cargando...</p>
+      ) : (
+        <>
+          <Title text="tareas" />
+          <div className={`${styles.cntnTable} table-responsive`}>
+            <div className={styles.titleAndButton}>
+              <p className={styles.title}>
+                {currentUser?.rol === "admin"
+                  ? "Todas las Tareas"
+                  : "Tus tareas"}
+              </p>
 
-          <div className={styles.inputs}>
-            <i className="fa fa-search"></i>
-            <input
-              type="text"
-              placeholder="Buscar proyecto..."
-              value={search}
-              onChange={(e) => {
-                e.preventDefault();
-                const searchTerm = e.target.value.trim();
-                setSearch(searchTerm);
+              <div className={styles.inputs}>
+                <i className="fa fa-search"></i>
+                <input
+                  type="text"
+                  placeholder="Buscar tarea..."
+                  value={search}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    const searchTerm = e.target.value.trim();
+                    setSearch(searchTerm);
 
-                if (searchTerm === "") {
-                  // Si el input está vacío, carga todos los proyectos normales
-                  dispatch(fetchAllTasks({ page: 1 }));
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
+                    if (searchTerm === "") {
+                      // Si el input está vacío, carga todos los proyectos normales
+                      dispatch(fetchAllTasks({ page: 1 }));
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
 
-                  const searchTerm = search.trim();
-                  if (searchTerm) {
-                    // Busco con el término ingresado
-                    dispatch(fetchAllTasks({ page: 1, search: searchTerm }));
-                  } else {
-                    // Si no hay término, recarga los proyectos normales
-                    dispatch(fetchAllTasks({ page: 1 }));
-                  }
-                }
-              }}
-            />
-          </div>
+                      const searchTerm = search.trim();
+                      if (searchTerm) {
+                        // Busco con el término ingresado
+                        dispatch(
+                          fetchAllTasks({ page: 1, search: searchTerm })
+                        );
+                      } else {
+                        // Si no hay término, recarga los proyectos normales
+                        dispatch(fetchAllTasks({ page: 1 }));
+                      }
+                    }
+                  }}
+                />
+              </div>
 
-          {currentUser?.rol === "admin" && (
-            <Button
-              className={`${styles.customButton} btn  btn-sm rounded-pill`}
-              onClick={handleShow}
-            >
-              + Nueva
-            </Button>
-          )}
-        </div>
-        <Table bordered hover>
-          <thead>
-            <tr>
-              <th className={styles.tableHeader}></th>
-              <th className={styles.tableHeader}>Nombre</th>
-              <th className={styles.tableHeader}>Estado</th>
-              {currentUser.rol === "admin" && (
-                <th className={styles.tableHeader}>Responsable</th>
+              {currentUser?.rol === "admin" && (
+                <Button
+                  className={`${styles.customButton} btn  btn-sm rounded-pill`}
+                  onClick={handleShow}
+                >
+                  + Nueva
+                </Button>
               )}
-
-              <th className={styles.tableHeader}>Proyecto</th>
-              <th className={styles.tableHeader}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.length > 0 ? (
-              tasks.map((task) => (
-                <tr key={task.id}>
-                  <td>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-in-progress-${task.id}`}>
-                          Completada
-                        </Tooltip>
-                      }
-                    >
-                      <input
-                        className={`${styles.inputCheck} form-check-input me-3`}
-                        type="checkbox"
-                        checked={task.estado === "completada"}
-                        onChange={() => handleCheckboxChange(task)}
-                        aria-label="..."
-                      />
-                    </OverlayTrigger>
-                  </td>
-                  <td className={styles.td}>{task.nombre}</td>
-                  <td className={styles.td}>
-                    {task.estado === "completada" ? (
-                      <span className="text-danger me-3">Completada</span>
-                    ) : task.estado === "en progreso" ? (
-                      <span className="text-primary me-3">En progreso</span>
-                    ) : (
-                      <span className="text-success me-3">Pendiente</span>
-                    )}
-                  </td>
+            </div>
+            <Table bordered hover>
+              <thead>
+                <tr>
+                  <th className={styles.tableHeader}></th>
+                  <th className={styles.tableHeader}>Nombre</th>
+                  <th className={styles.tableHeader}>Estado</th>
                   {currentUser.rol === "admin" && (
-                    <td className={styles.td}>{task.usuario_nombre}</td>
+                    <th className={styles.tableHeader}>Responsable</th>
                   )}
-                  <td className={styles.td}>{task.proyecto_nombre}</td>
-                  <td className={styles.td}>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-in-progress-${task.id}`}>
-                          En proceso
-                        </Tooltip>
-                      }
-                    >
-                      <span>
-                        <RiProgress2Line
-                          onClick={() => handleSetInProgress(task)}
-                          size={16}
-                          color="blue"
-                          style={{ marginRight: "4px", cursor: "pointer" }}
-                        />
-                      </span>
-                    </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-${task.id}`}>Eliminar</Tooltip>
-                      }
-                    >
-                      <span>
-                        {currentUser?.rol === "admin" && (
-                          <MdOutlineDelete
-                            onClick={() => handleShowDeleteModal(task.id)}
-                            size={16}
-                            color="red"
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                      </span>
-                    </OverlayTrigger>
-                  </td>
+
+                  <th className={styles.tableHeader}>Proyecto</th>
+                  <th className={styles.tableHeader}>Acciones</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  No hay tareas disponibles.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-        <div className={styles.paginado}>
-          <Pagination>
-            <Pagination.Prev
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={styles.buttonPagination}
-            />
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={currentPage === i + 1}
-                onClick={() => handlePageChange(i + 1)}
-                className={styles.buttonPagination}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={styles.buttonPagination}
-            />
-          </Pagination>
-        </div>
-      </div>
+              </thead>
+              <tbody>
+                {tasks.length > 0 ? (
+                  tasks.map((task) => (
+                    <tr key={task.id}>
+                      <td>
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-in-progress-${task.id}`}>
+                              Completada
+                            </Tooltip>
+                          }
+                        >
+                          <input
+                            className={`${styles.inputCheck} form-check-input me-3`}
+                            type="checkbox"
+                            checked={task.estado === "completada"}
+                            onChange={() => handleCheckboxChange(task)}
+                            aria-label="..."
+                          />
+                        </OverlayTrigger>
+                      </td>
+                      <td className={styles.td}>{task.nombre}</td>
+                      <td className={styles.td}>
+                        {task.estado === "completada" ? (
+                          <span className="text-danger me-3">Completada</span>
+                        ) : task.estado === "en progreso" ? (
+                          <span className="text-primary me-3">En progreso</span>
+                        ) : (
+                          <span className="text-success me-3">Pendiente</span>
+                        )}
+                      </td>
+                      {currentUser.rol === "admin" && (
+                        <td className={styles.td}>{task.usuario_nombre}</td>
+                      )}
+                      <td className={styles.td}>{task.proyecto_nombre}</td>
+                      <td className={styles.td}>
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-in-progress-${task.id}`}>
+                              En proceso
+                            </Tooltip>
+                          }
+                        >
+                          <span>
+                            <RiProgress2Line
+                              onClick={() => handleSetInProgress(task)}
+                              size={16}
+                              color="blue"
+                              style={{ marginRight: "4px", cursor: "pointer" }}
+                            />
+                          </span>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-${task.id}`}>
+                              Eliminar
+                            </Tooltip>
+                          }
+                        >
+                          <span>
+                            {currentUser?.rol === "admin" && (
+                              <MdOutlineDelete
+                                onClick={() => handleShowDeleteModal(task.id)}
+                                size={16}
+                                color="red"
+                                style={{ cursor: "pointer" }}
+                              />
+                            )}
+                          </span>
+                        </OverlayTrigger>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      No hay tareas disponibles.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+            <div className={styles.paginado}>
+              <Pagination>
+                <Pagination.Prev
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={styles.buttonPagination}
+                />
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Pagination.Item
+                    key={i + 1}
+                    active={currentPage === i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={styles.buttonPagination}
+                  >
+                    {i + 1}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={styles.buttonPagination}
+                />
+              </Pagination>
+            </div>
+          </div>
+        </>
+      )}
 
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton className={styles.headerModal}>

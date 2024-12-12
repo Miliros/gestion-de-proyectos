@@ -7,9 +7,3 @@
   /* padding-top: 50px; */
   background-image: url("mii.jpg");
 }
-.Title {
-  display: flex;
-  justify-content: flex-start;
-  color: white;
-  font-size: 16px;
-}

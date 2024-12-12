@@ -7,6 +7,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import styles from "./Users.module.css";
+import Title from "../Title/Title";
 
 const User = () => {
   const dispatch = useDispatch();
@@ -48,6 +49,7 @@ const User = () => {
 
   return (
     <div className={styles.cntnUser}>
+      <Title text="usuarios" />
       <div className={`${styles.cntnTable} table-responsive`}>
         <div className={styles.titleAndButton}>
           <p className={styles.title}>Usuarios registrados</p>

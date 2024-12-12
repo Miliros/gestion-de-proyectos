@@ -13,7 +13,6 @@ const Home = () => {
       <div className={styles.cntn}>
         {user?.rol === "admin" ? <Projects /> : <UserTareas />}
       </div>
-      <div className={styles.Title}>Bienvenido/a, {user?.nombre}</div>
     </div>
   );
 };

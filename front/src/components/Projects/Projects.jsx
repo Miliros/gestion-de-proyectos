@@ -16,6 +16,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
 import NewProjectForm from "./NewProjectForm";
+import Title from "../Title/Title";
 
 import { toast } from "react-toastify";
 import _ from "lodash";
@@ -227,165 +228,172 @@ const Projects = () => {
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <div className={`${styles.cntnTable} table-responsive`}>
-          <div className={styles.titleAndButton}>
-            <p className={styles.title}>Proyectos activos</p>
+        <>
+          <Title text="proyectos" />
+          <div className={`${styles.cntnTable} table-responsive`}>
+            <div className={styles.titleAndButton}>
+              <p className={styles.title}>Proyectos activos</p>
 
-            <div className={styles.inputs}>
-              <i className="fa fa-search"></i>
-              <input
-                type="text"
-                placeholder="Buscar proyecto..."
-                value={search}
-                onChange={(e) => {
-                  e.preventDefault();
-                  const searchTerm = e.target.value.trim();
-                  setSearch(searchTerm);
-
-                  if (searchTerm === "") {
-                    // Si el input está vacío, carga todos los proyectos normales
-                    dispatch(fetchProjects({ page: 1 }));
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+              <div className={styles.inputs}>
+                <i className="fa fa-search"></i>
+                <input
+                  type="text"
+                  placeholder="Buscar proyecto..."
+                  value={search}
+                  onChange={(e) => {
                     e.preventDefault();
+                    const searchTerm = e.target.value.trim();
+                    setSearch(searchTerm);
 
-                    const searchTerm = search.trim();
-                    if (searchTerm) {
-                      // Busco con el término ingresado
-                      dispatch(fetchProjects({ page: 1, search: searchTerm }));
-                    } else {
-                      // Si no hay término, recarga los proyectos normales
+                    if (searchTerm === "") {
+                      // Si el input está vacío, carga todos los proyectos normales
                       dispatch(fetchProjects({ page: 1 }));
                     }
-                  }
-                }}
-              />
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+
+                      const searchTerm = search.trim();
+                      if (searchTerm) {
+                        // Busco con el término ingresado
+                        dispatch(
+                          fetchProjects({ page: 1, search: searchTerm })
+                        );
+                      } else {
+                        // Si no hay término, recarga los proyectos normales
+                        dispatch(fetchProjects({ page: 1 }));
+                      }
+                    }
+                  }}
+                />
+              </div>
+
+              <button
+                className={`${styles.customButton} btn  btn-sm rounded-pill`}
+                onClick={handleShow}
+              >
+                + Nuevo
+              </button>
             </div>
 
-            <button
-              className={`${styles.customButton} btn  btn-sm rounded-pill`}
-              onClick={handleShow}
-            >
-              + Nuevo
-            </button>
-          </div>
-
-          <Table bordered hover>
-            <thead>
-              <tr>
-                <th className={styles.tableHeader}></th>
-                <th className={styles.tableHeader}>Nombre</th>
-                <th className={styles.tableHeader}>Descripción</th>
-                <th className={styles.tableHeader}>Responsable</th>
-                <th className={styles.tableHeader}>Inicio</th>
-                <th className={styles.tableHeader}>Finalización</th>
-                {currentUser?.rol === "admin" && (
-                  <th className={styles.tableHeader}>Acciones</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {projects.length > 0 ? (
-                projects.map((project) => (
-                  <tr key={project.id}>
-                    <td>
-                      {users === "admin" && (
-                        <input
-                          className={`${styles.inputCheck} form-check-input`}
-                          type="checkbox"
-                          id={`checkbox-${project.id}`}
-                          value={project.id}
-                          aria-label="..."
-                        />
-                      )}
-                    </td>
-                    <td className={styles.td}>{project.nombre}</td>
-                    <td className={styles.td}>{project.descripcion}</td>
-                    <td className={styles.td}>
-                      {project.usuario_nombre || "No asignado"}
-                    </td>
-                    <td>
-                      {new Date(project.fecha_inicio).toLocaleDateString()}
-                    </td>
-                    <td>
-                      {new Date(
-                        project.fecha_finalizacion
-                      ).toLocaleDateString()}
-                    </td>
-                    {currentUser?.rol === "admin" && (
-                      <td>
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-edit-${project.id}`}>
-                              Editar
-                            </Tooltip>
-                          }
-                        >
-                          <span>
-                            <FiEdit
-                              size={15}
-                              onClick={() => handleEditProject(project)}
-                              style={{ cursor: "pointer" }}
-                            />
-                          </span>
-                        </OverlayTrigger>
-
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-delete-${project.id}`}>
-                              Eliminar
-                            </Tooltip>
-                          }
-                        >
-                          <span>
-                            <MdOutlineDelete
-                              size={17}
-                              color="red"
-                              onClick={() => handleShowDeleteModal(project.id)}
-                              style={{ cursor: "pointer", marginLeft: 8 }}
-                            />
-                          </span>
-                        </OverlayTrigger>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              ) : (
+            <Table bordered hover>
+              <thead>
                 <tr>
-                  <td colSpan={7}>No hay proyectos para mostrar</td>
+                  <th className={styles.tableHeader}></th>
+                  <th className={styles.tableHeader}>Nombre</th>
+                  <th className={styles.tableHeader}>Descripción</th>
+                  <th className={styles.tableHeader}>Responsable</th>
+                  <th className={styles.tableHeader}>Inicio</th>
+                  <th className={styles.tableHeader}>Finalización</th>
+                  {currentUser?.rol === "admin" && (
+                    <th className={styles.tableHeader}>Acciones</th>
+                  )}
                 </tr>
-              )}
-            </tbody>
-          </Table>
-          <div className={styles.paginado}>
-            <Pagination>
-              <Pagination.Prev
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={styles.buttonPagination}
-              />
-              {Array.from({ length: totalPages }, (_, i) => (
-                <Pagination.Item
-                  key={i + 1}
-                  active={currentPage === i + 1}
-                  onClick={() => handlePageChange(i + 1)}
+              </thead>
+              <tbody>
+                {projects.length > 0 ? (
+                  projects.map((project) => (
+                    <tr key={project.id}>
+                      <td>
+                        {users === "admin" && (
+                          <input
+                            className={`${styles.inputCheck} form-check-input`}
+                            type="checkbox"
+                            id={`checkbox-${project.id}`}
+                            value={project.id}
+                            aria-label="..."
+                          />
+                        )}
+                      </td>
+                      <td className={styles.td}>{project.nombre}</td>
+                      <td className={styles.td}>{project.descripcion}</td>
+                      <td className={styles.td}>
+                        {project.usuario_nombre || "No asignado"}
+                      </td>
+                      <td>
+                        {new Date(project.fecha_inicio).toLocaleDateString()}
+                      </td>
+                      <td>
+                        {new Date(
+                          project.fecha_finalizacion
+                        ).toLocaleDateString()}
+                      </td>
+                      {currentUser?.rol === "admin" && (
+                        <td>
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-edit-${project.id}`}>
+                                Editar
+                              </Tooltip>
+                            }
+                          >
+                            <span>
+                              <FiEdit
+                                size={15}
+                                onClick={() => handleEditProject(project)}
+                                style={{ cursor: "pointer" }}
+                              />
+                            </span>
+                          </OverlayTrigger>
+
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-delete-${project.id}`}>
+                                Eliminar
+                              </Tooltip>
+                            }
+                          >
+                            <span>
+                              <MdOutlineDelete
+                                size={17}
+                                color="red"
+                                onClick={() =>
+                                  handleShowDeleteModal(project.id)
+                                }
+                                style={{ cursor: "pointer", marginLeft: 8 }}
+                              />
+                            </span>
+                          </OverlayTrigger>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7}>No hay proyectos para mostrar</td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+            <div className={styles.paginado}>
+              <Pagination>
+                <Pagination.Prev
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                   className={styles.buttonPagination}
-                >
-                  {i + 1}
-                </Pagination.Item>
-              ))}
-              <Pagination.Next
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={styles.buttonPagination}
-              />
-            </Pagination>
+                />
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Pagination.Item
+                    key={i + 1}
+                    active={currentPage === i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={styles.buttonPagination}
+                  >
+                    {i + 1}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={styles.buttonPagination}
+                />
+              </Pagination>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       <Modal

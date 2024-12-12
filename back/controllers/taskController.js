@@ -131,7 +131,7 @@ export const getTasksByProject = async (req, res) => {
 // Obtener todas las tareas con paginado y búsqueda
 export const getAllTasks = async (req, res) => {
   let page = parseInt(req.query.page) || 1; // Página por defecto = 1
-  const limit = 7; // Número de elementos por página
+  const limit = 6; // Número de elementos por página
   const search = req.query.search || ""; // Parámetro de búsqueda (por nombre)
 
   // Asegurarse de que la página solicitada no sea menor que 1
