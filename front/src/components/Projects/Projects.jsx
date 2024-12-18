@@ -20,12 +20,15 @@ import Title from "../Title/Title";
 
 import { toast } from "react-toastify";
 import _ from "lodash";
+import DeleteModal from "../Delete/DeleteModal";
+import CustomModal from "../CustomModal/CustomModal";
 
 const Projects = () => {
   const dispatch = useDispatch();
 
   //redux
   const projects = useSelector((state) => state.projects.projects);
+
   const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.projects.loading);
@@ -68,7 +71,7 @@ const Projects = () => {
 
   // Effects
   useEffect(() => {
-    dispatch(fetchProjects({ page: currentPage }));
+    dispatch(fetchProjects({ page: currentPage, search }));
     dispatch(fetchUsers());
   }, [dispatch, currentPage]);
 
@@ -223,13 +226,15 @@ const Projects = () => {
     setProjectToDelete(null);
   };
 
+  console.log(totalPages, "ACA");
+
   return (
     <div className={styles.cntnProject}>
       {loading ? (
         <p>Cargando...</p>
       ) : (
         <>
-          <Title text="proyectos" />
+          <Title text="Proyectos" />
           <div className={`${styles.cntnTable} table-responsive`}>
             <div className={styles.titleAndButton}>
               <p className={styles.title}>Proyectos activos</p>
@@ -246,22 +251,18 @@ const Projects = () => {
                     setSearch(searchTerm);
 
                     if (searchTerm === "") {
-                      // Si el input está vacío, carga todos los proyectos normales
-                      dispatch(fetchProjects({ page: 1 }));
+                      dispatch(fetchProjects({ page: 1 })); // Cargar todos si no hay búsqueda
                     }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-
                       const searchTerm = search.trim();
                       if (searchTerm) {
-                        // Busco con el término ingresado
                         dispatch(
                           fetchProjects({ page: 1, search: searchTerm })
                         );
                       } else {
-                        // Si no hay término, recarga los proyectos normales
                         dispatch(fetchProjects({ page: 1 }));
                       }
                     }
@@ -270,7 +271,7 @@ const Projects = () => {
               </div>
 
               <button
-                className={`${styles.customButton} btn  btn-sm rounded-pill`}
+                className={`${styles.customButton} btn btn-sm rounded-pill`}
                 onClick={handleShow}
               >
                 + Nuevo
@@ -363,7 +364,9 @@ const Projects = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7}>No hay proyectos para mostrar</td>
+                    <td colSpan={7}>
+                      No se encontraron proyectos con ese término de búsqueda
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -396,74 +399,44 @@ const Projects = () => {
         </>
       )}
 
-      <Modal
+      {/* Modales */}
+      <CustomModal
         show={show}
         onHide={handleClose}
-        backdrop="static"
-        keyboard={true}
-        centered
+        title="Nuevo Proyecto"
+        classNameHeader="modalHeader"
+        classNameBody="bodyModal"
       >
-        <Modal.Header closeButton className={styles.modalHeader}>
-          <Modal.Title className={styles.titleModal}>
-            Nuevo Proyecto
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className={styles.bodyModal}>
-          <NewProjectForm
-            newProject={newProject}
-            users={users}
-            handleChange={handleChange}
-            handleSubmit={handleAddProject}
-          />
-        </Modal.Body>
-      </Modal>
+        <NewProjectForm
+          newProject={newProject}
+          users={users}
+          handleChange={handleChange}
+          handleSubmit={handleAddProject}
+        />
+      </CustomModal>
 
-      <Modal
+      <CustomModal
         show={showEditModal}
         onHide={handleCloseEdit}
-        backdrop="static"
-        keyboard={true}
-        centered
+        title="Editar Proyecto"
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Editar Proyecto</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <NewProjectForm
-            newProject={editingProject}
-            users={users}
-            handleChange={handleEditChange}
-            handleSubmit={handleUpdateProject}
-            isEditing={true}
-          />
-        </Modal.Body>
-      </Modal>
+        <NewProjectForm
+          newProject={editingProject}
+          users={users}
+          handleChange={handleEditChange}
+          handleSubmit={handleUpdateProject}
+          isEditing={true}
+        />
+      </CustomModal>
 
-      <Modal
+      <DeleteModal
         show={showDeleteModal}
         onHide={handleCloseDelete}
-        backdrop="static"
-        keyboard={true}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Eliminar Proyecto</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Button
-            className={`${styles.customButtonDeleteConfirm2} btn  btn-sm rounded-pill`}
-            onClick={handleDeleteProject}
-          >
-            Cancelar
-          </Button>
-          <Button
-            className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
-            onClick={handleDeleteProject}
-          >
-            Eliminar
-          </Button>
-        </Modal.Body>
-      </Modal>
+        onConfirm={handleDeleteProject}
+        title="Eliminar Proyecto"
+        description="¿Estás seguro de que deseas eliminar este Proyecto?"
+        styles={styles}
+      />
     </div>
   );
 };

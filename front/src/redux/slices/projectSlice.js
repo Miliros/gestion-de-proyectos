@@ -165,7 +165,7 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message; // Manejar error del servidor o genérico
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.projects.push(action.payload);

@@ -12,15 +12,16 @@ const pool = new Pool({
 });
 
 export const getAllProjects = async (req, res) => {
-  let page = parseInt(req.query.page) || 1; // Página por defecto = 1
-  const limit = 6; // Número de elementos por página
-  const search = req.query.search || ""; // Parámetro de búsqueda (por nombre)
+  let page = parseInt(req.query.page, 10) || 1;
+  const limit = 6;
+  const search = req.query.search || "";
 
-  // Asegurarse de que la página solicitada no sea menor que 1
-  if (page < 1) {
+  if (isNaN(page) || page < 1) {
     return res
       .status(400)
-      .json({ error: "La página debe ser mayor o igual a 1" });
+      .json({
+        error: "El parámetro 'page' debe ser un número mayor o igual a 1",
+      });
   }
 
   const offset = (page - 1) * limit;
@@ -29,17 +30,27 @@ export const getAllProjects = async (req, res) => {
     // Contamos los proyectos que coinciden con la búsqueda
     const totalResult = await pool.query(
       `SELECT COUNT(*) FROM proyectos WHERE nombre ILIKE $1`,
-      [`%${search}%`] // Filtramos por nombre (case-insensitive)
+      [`%${search}%`]
     );
-    const totalProjects = parseInt(totalResult.rows[0].count, 10); // Total de proyectos filtrados
 
+    const totalProjects = parseInt(totalResult.rows[0].count, 10);
     const totalPages = Math.ceil(totalProjects / limit);
 
-    if (page > totalPages) {
-      return res.status(404).json({ error: "Página fuera de rango" });
+    if (totalPages === 0) {
+      return res.status(200).json({
+        projects: [],
+        totalProjects: 0,
+        totalPages: 0,
+        currentPage: 0,
+        message: "No se encontraron proyectos.",
+      });
     }
 
-    console.log(`Limit: ${limit}, Offset: ${offset}, Search: ${search}`);
+    if (page > totalPages) {
+      return res
+        .status(400)
+        .json({ error: "No hay más resultados para esta búsqueda" });
+    }
 
     // Consultamos los proyectos filtrados por nombre
     const result = await pool.query(
@@ -51,7 +62,7 @@ export const getAllProjects = async (req, res) => {
         p.fecha_finalizacion, 
         u.nombre AS usuario_nombre
       FROM proyectos p
-      JOIN usuarios u ON p.usuario_id = u.id
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
       WHERE p.nombre ILIKE $1
       LIMIT $2 OFFSET $3`,
       [`%${search}%`, limit, offset]
@@ -59,9 +70,9 @@ export const getAllProjects = async (req, res) => {
 
     res.json({
       projects: result.rows,
-      totalProjects, // Total de proyectos filtrados
-      totalPages, // Total de páginas disponibles
-      currentPage: page, // Página actual
+      totalProjects,
+      totalPages,
+      currentPage: page,
     });
   } catch (error) {
     console.error("Error al obtener proyectos filtrados:", error);

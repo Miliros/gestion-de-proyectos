@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUsers, deleteUser } from "../../redux/slices/userSlice";
-import { Modal, Button } from "react-bootstrap";
+import { Pagination } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { MdOutlineDelete } from "react-icons/md";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import styles from "./Users.module.css";
+
 import Title from "../Title/Title";
+import DeleteModal from "../Delete/DeleteModal";
 
 const User = () => {
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.users.users);
+  const users = useSelector((state) => state.users.users.usuarios);
+  const currentPage = useSelector((state) => state.users.currentPage);
+  const totalPages = useSelector((state) => state.users.totalPages);
+
   const loading = useSelector((state) => state.users.loading);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  console.log(users, "a");
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    dispatch(fetchUsers({ page: currentPage, search }));
+  }, [dispatch, currentPage]);
 
   const handleShowDeleteModal = (id) => {
     setUserToDelete(id); // Configura el usuario a eliminar
@@ -46,6 +52,13 @@ const User = () => {
         alert("Error al eliminar el usuario");
       });
   };
+  // Pagination
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      dispatch(fetchUsers({ page }));
+      // Asegúrate de actualizar el estado local de la página
+    }
+  };
 
   return (
     <div className={styles.cntnUser}>
@@ -56,7 +69,31 @@ const User = () => {
 
           <div className={styles.inputs}>
             <i className="fa fa-search"></i>
-            <input type="text" placeholder="Buscar usuario..." />
+            <input
+              type="text"
+              placeholder="Buscar proyecto..."
+              value={search}
+              onChange={(e) => {
+                e.preventDefault();
+                const searchTerm = e.target.value.trim();
+                setSearch(searchTerm);
+
+                if (searchTerm === "") {
+                  dispatch(fetchUsers({ page: 1 })); // Cargar todos si no hay búsqueda
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const searchTerm = search.trim();
+                  if (searchTerm) {
+                    dispatch(fetchUsers({ page: 1, search: searchTerm }));
+                  } else {
+                    dispatch(fetchUsers({ page: 1 }));
+                  }
+                }
+              }}
+            />
           </div>
         </div>
         <Table bordered hover>
@@ -69,7 +106,7 @@ const User = () => {
             </tr>
           </thead>
           <tbody>
-            {users.length > 0 ? (
+            {users?.length > 0 ? (
               users.map((user) => (
                 <tr key={user.id}>
                   <td className={styles.td}>{user.nombre}</td>
@@ -103,27 +140,40 @@ const User = () => {
             )}
           </tbody>
         </Table>
+        <div className={styles.paginado}>
+          <Pagination>
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={styles.buttonPagination}
+            />
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Pagination.Item
+                key={i + 1}
+                active={currentPage === i + 1}
+                onClick={() => handlePageChange(i + 1)}
+                className={styles.buttonPagination}
+              >
+                {i + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={styles.buttonPagination}
+            />
+          </Pagination>
+        </div>
       </div>
 
-      <Modal
+      <DeleteModal
         show={showDeleteModal}
         onHide={handleCloseDelete}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Eliminar Usuario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          ¿Estás seguro que deseas eliminar este usuario?
-          <Button
-            className={`${styles.customButtonDeleteConfirm} btn btn-sm rounded-pill`}
-            onClick={handleDeleteUser}
-          >
-            Eliminar
-          </Button>
-        </Modal.Body>
-      </Modal>
+        onConfirm={handleDeleteUser}
+        title="Eliminar Usuario"
+        description="¿Estás seguro de que deseas eliminar este Usuario?"
+        styles={styles}
+      />
     </div>
   );
 };

@@ -20,6 +20,8 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
 import Title from "../Title/Title";
+import DeleteModal from "../Delete/DeleteModal";
+import CustomModal from "../CustomModal/CustomModal";
 
 const Task = () => {
   const dispatch = useDispatch();
@@ -449,8 +451,8 @@ const Task = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">
-                      No hay tareas disponibles.
+                    <td colSpan={7}>
+                      No se encontraron tareas con ese término de búsqueda
                     </td>
                   </tr>
                 )}
@@ -484,49 +486,32 @@ const Task = () => {
         </>
       )}
 
-      <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton className={styles.headerModal}>
-          <Modal.Title>Nueva Tarea</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <NewTaskForm
-            newTask={newTask}
-            setNewTask={setNewTask}
-            editingTask={editingTask}
-            setEditingTask={setEditingTask}
-            editingTaskId={editingTaskId}
-            handleSubmit={handleSubmit}
-            users={users}
-            projects={projects}
-            setSelectedProjectId={setSelectedProjectId}
-          />
-        </Modal.Body>
-      </Modal>
-      <Modal
+      <CustomModal
+        show={show}
+        onHide={handleClose}
+        title="Nueva Tarea"
+        classNameHeader="headerModal"
+      >
+        <NewTaskForm
+          newTask={newTask}
+          setNewTask={setNewTask}
+          editingTask={editingTask}
+          setEditingTask={setEditingTask}
+          editingTaskId={editingTaskId}
+          handleSubmit={handleSubmit}
+          users={users}
+          projects={projects}
+          setSelectedProjectId={setSelectedProjectId}
+        />
+      </CustomModal>
+      <DeleteModal
         show={showDeleteModal}
         onHide={handleCloseDelete}
-        backdrop="static"
-        keyboard={true}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Eliminar Tarea</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Button
-            className={`${styles.customButtonDeleteConfirm2} btn  btn-sm rounded-pill`}
-            onClick={handleDeleteTask}
-          >
-            Cancelar
-          </Button>
-          <Button
-            className={`${styles.customButtonDeleteConfirm} btn  btn-sm rounded-pill`}
-            onClick={handleDeleteTask}
-          >
-            Eliminar
-          </Button>
-        </Modal.Body>
-      </Modal>
+        onConfirm={handleDeleteTask}
+        title="Eliminar Tarea"
+        description="¿Estás seguro de que deseas eliminar esta tarea?"
+        styles={styles}
+      />
     </div>
   );
 };

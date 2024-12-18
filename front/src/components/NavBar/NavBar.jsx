@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
 import { useLocation, Link, NavLink } from "react-router-dom";
 import styles from "./NavBar.module.css";
@@ -13,6 +13,14 @@ const CustomNavbar = () => {
   const handleLogout = () => {
     dispatch(logout());
   };
+  const user = useSelector((state) => state.auth.user);
+  const userInitials = user?.nombre
+    ? user.nombre
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "?";
 
   return (
     <Navbar
@@ -46,13 +54,22 @@ const CustomNavbar = () => {
           </Nav>
 
           <Nav className="ms-auto d-flex align-items-center justify-content-center">
-            <Button
-              type="button"
-              onClick={handleLogout}
-              className={`${styles.buttonLog} btn btn-sm rounded-pill `}
-            >
-              Logout
-            </Button>
+            <Dropdown>
+              <Dropdown.Toggle as="div" className={styles.customDropdownToggle}>
+                <div className={styles.dropdownContainer}>
+                  <span className={styles.dropdownArrow}>▼</span>
+                  <div className={styles.dropdownCircle}>
+                    <p className={styles.dropdownInitials}>{userInitials}</p>
+                  </div>
+                </div>
+              </Dropdown.Toggle>
+              <Dropdown.Menu className={styles.customDropdownMenu}>
+                <Dropdown.Item href="#/action-2">Perfil</Dropdown.Item>
+                <Dropdown.Item href="#/action-1" onClick={handleLogout}>
+                  Cerrar Sesión
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </Nav>
         </Navbar.Collapse>
       </Container>

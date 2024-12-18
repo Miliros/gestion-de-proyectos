@@ -8,6 +8,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "./LoginForm.module.css";
 
 import log from "../Login/log.jpg";
+import { NewUserRegister } from "./NewUserRegister";
 
 function LoginForm() {
   const [show, setShow] = useState(false);
@@ -101,7 +102,7 @@ function LoginForm() {
               className="mb-3"
             >
               <Form.Control
-                type={showPassword ? "text" : "password"} // Cambia el tipo dinámicamente
+                type={showPassword ? "text" : "password"}
                 placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -110,7 +111,7 @@ function LoginForm() {
               <button
                 type="button"
                 className={styles.eyeButton}
-                onClick={() => setShowPassword(!showPassword)} // Cambia el estado al hacer clic
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -154,85 +155,22 @@ function LoginForm() {
           <Modal.Title className={styles.titleModal}>REGÍSTRATE</Modal.Title>
         </Modal.Header>
         <Modal.Body className={styles.bodyModal}>
-          <form onSubmit={handleRegisterSubmit} className={styles.form}>
-            <FloatingLabel
-              controlId="floatingRegisterName"
-              label="Nombre"
-              className="mb-3"
-            >
-              <Form.Control
-                type="text"
-                placeholder="Nombre"
-                value={registerName}
-                onChange={(e) => setRegisterName(e.target.value)}
-                required
-              />
-            </FloatingLabel>
-            <FloatingLabel
-              controlId="floatingRegisterEmail"
-              label="Correo Electrónico"
-              className="mb-3"
-            >
-              <Form.Control
-                type="email"
-                placeholder="Correo Electrónico"
-                value={registerEmail}
-                onChange={(e) => setRegisterEmail(e.target.value)}
-                required
-              />
-            </FloatingLabel>
-
-            <FloatingLabel
-              controlId="floatingRegisterPassword"
-              label="Contraseña"
-              className="mb-3"
-            >
-              <Form.Control
-                type={showPassword ? "text" : "password"}
-                placeholder="Contraseña"
-                value={registerPassword}
-                onChange={(e) => setRegisterPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                className={styles.eyeButton}
-                onClick={() => setShowPassword(!showPassword)} // Cambia el estado al hacer clic
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </FloatingLabel>
-
-            <Form.Group controlId="floatingRole" className={styles.cntnCheck}>
-              {/* <Form.Label className={styles.label}>Rol:</Form.Label> */}
-              <Form.Check
-                type="radio"
-                label="Admin"
-                name="role"
-                value="admin"
-                checked={role === "admin"}
-                onChange={() => setRole("admin")}
-                className={styles.check}
-              />
-              <Form.Check
-                type="radio"
-                label="User"
-                name="role"
-                value="user"
-                checked={role === "user"}
-                onChange={() => setRole("usuario")}
-                className={styles.check}
-              />
-            </Form.Group>
-
-            <button
-              type="submit"
-              className={styles.buttonLog}
-              disabled={loading}
-            >
-              {loading ? "Registrando..." : "Create"}
-            </button>
-          </form>
+          <NewUserRegister
+            registerName={registerName}
+            setRegisterName={setRegisterName}
+            registerEmail={registerEmail}
+            setRegisterEmail={setRegisterEmail}
+            registerPassword={registerPassword}
+            setRegisterPassword={setRegisterPassword}
+            role={role}
+            setRole={setRole}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            loading={loading}
+            handleRegisterSubmit={handleRegisterSubmit}
+            handleClose={handleClose}
+            showModal={show}
+          />
           <Modal.Footer className={styles.modalFooter}></Modal.Footer>
         </Modal.Body>
       </Modal>

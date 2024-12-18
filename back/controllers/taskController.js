@@ -153,8 +153,20 @@ export const getAllTasks = async (req, res) => {
 
     const totalPages = Math.ceil(totalTasks / limit);
 
+    if (totalPages === 0) {
+      return res.status(200).json({
+        tasks: [], // No hay tareas, se devuelve un array vacío
+        totalTasks, // Total de tareas filtradas
+        totalPages, // Total de páginas disponibles
+        currentPage: page, // Página actual
+        message: "No se encontraron tareas.",
+      });
+    }
+
     if (page > totalPages) {
-      return res.status(404).json({ error: "Página fuera de rango" });
+      return res
+        .status(400)
+        .json({ error: "No hay más resultados para esta búsqueda" });
     }
 
     // Consultamos las tareas filtradas por nombre
@@ -175,6 +187,7 @@ export const getAllTasks = async (req, res) => {
       [`%${search}%`, limit, offset]
     );
 
+    // Si se encuentran tareas, respondemos normalmente
     res.json({
       tasks: result.rows,
       totalTasks, // Total de tareas filtradas
