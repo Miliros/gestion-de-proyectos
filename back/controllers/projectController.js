@@ -17,11 +17,9 @@ export const getAllProjects = async (req, res) => {
   const search = req.query.search || "";
 
   if (isNaN(page) || page < 1) {
-    return res
-      .status(400)
-      .json({
-        error: "El parámetro 'page' debe ser un número mayor o igual a 1",
-      });
+    return res.status(400).json({
+      error: "El parámetro 'page' debe ser un número mayor o igual a 1",
+    });
   }
 
   const offset = (page - 1) * limit;
@@ -156,10 +154,50 @@ export const updateProject = async (req, res) => {
     res.status(500).json({ error: "Error al actualizar proyecto" });
   }
 };
-// Obtener proyectos asignados a un usuario por su ID
+// Obtener proyectos asignados a un usuario por su ID con buscador y paginado
 export const getProjectsByUserId = async (req, res) => {
   const { userId } = req.params;
+  let page = parseInt(req.query.page, 10) || 1;
+  const limit = 6;
+  const search = req.query.search || "";
+
+  if (isNaN(page) || page < 1) {
+    return res.status(400).json({
+      error: "El parámetro 'page' debe ser un número mayor o igual a 1",
+    });
+  }
+
+  const offset = (page - 1) * limit;
+
   try {
+    // Contar proyectos para el usuario con filtro de búsqueda
+    const totalResult = await pool.query(
+      `SELECT COUNT(*) 
+       FROM proyectos 
+       WHERE usuario_id = $1 AND nombre ILIKE $2`,
+      [userId, `%${search}%`]
+    );
+
+    const totalProjects = parseInt(totalResult.rows[0].count, 10);
+    const totalPages = Math.ceil(totalProjects / limit);
+
+    if (totalPages === 0) {
+      return res.status(200).json({
+        projects: [],
+        totalProjects: 0,
+        totalPages: 0,
+        currentPage: 0,
+        message: "No se encontraron proyectos.",
+      });
+    }
+
+    if (page > totalPages) {
+      return res
+        .status(400)
+        .json({ error: "No hay más resultados para esta búsqueda" });
+    }
+
+    // Obtener proyectos del usuario con paginado y filtro
     const result = await pool.query(
       `
       SELECT 
@@ -169,18 +207,18 @@ export const getProjectsByUserId = async (req, res) => {
         p.fecha_inicio, 
         p.fecha_finalizacion
       FROM proyectos p
-      WHERE p.usuario_id = $1
+      WHERE p.usuario_id = $1 AND p.nombre ILIKE $2
+      LIMIT $3 OFFSET $4
     `,
-      [userId]
+      [userId, `%${search}%`, limit, offset]
     );
 
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No se encontraron proyectos para este usuario" });
-    }
-
-    res.json(result.rows);
+    res.json({
+      projects: result.rows,
+      totalProjects,
+      totalPages,
+      currentPage: page,
+    });
   } catch (error) {
     console.error("Error al obtener proyectos por usuario:", error);
     res.status(500).json({ error: "Error al obtener proyectos" });

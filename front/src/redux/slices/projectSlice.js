@@ -116,17 +116,20 @@ export const deleteProject = createAsyncThunk(
   }
 );
 
-// Obtener proyectos por userId
+// Acción para obtener proyectos por userId con búsqueda y paginado
 export const fetchProjectsByUser = createAsyncThunk(
   "projects/fetchProjectsByUser",
-  async (userId, { rejectWithValue }) => {
+  async ({ userId, page = 1, search = "" }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/usuario/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
-      return response.data;
+      const response = await axios.get(
+        `${API_URL}/usuario/${userId}?page=${page}&search=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+      return response.data; // Asegúrate de que el backend devuelva `projects`, `totalPages` y `currentPage`.
     } catch (error) {
       if (
         error.response &&
@@ -189,7 +192,9 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjectsByUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects = action.payload;
+        state.projects = action.payload.projects;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchProjectsByUser.rejected, (state, action) => {
         state.loading = false;
