@@ -78,7 +78,7 @@ export const NewTaskForm = ({
           }
         >
           <option value="">Selecciona un usuario</option>
-          {users.map((user) => (
+          {users?.map((user) => (
             <option key={user.id} value={user.id}>
               {user.nombre}
             </option>

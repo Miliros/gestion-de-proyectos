@@ -20,6 +20,11 @@ const UserTareas = () => {
   const [search, setSearch] = useState("");
 
   const dispatch = useDispatch();
+
+  const handlePageChange = (page) => {
+    dispatch(fetchProjectsByUser({ userId: id, page, search }));
+  };
+
   console.log(userProjects);
 
   useEffect(() => {
@@ -35,8 +40,7 @@ const UserTareas = () => {
       ) : (
         <div className={`${styles.cntnTable} table-responsive`}>
           <div className={styles.titleAndButton}>
-            <p className={styles.title}>Tus proyectos </p>
-
+            <p className={styles.title}>Tus proyectos</p>
             <div className={styles.inputs}>
               <i className="fa fa-search"></i>
               <input
@@ -44,18 +48,19 @@ const UserTareas = () => {
                 placeholder="Buscar proyecto..."
                 value={search}
                 onChange={(e) => {
-                  e.preventDefault();
                   const searchTerm = e.target.value.trim();
-                  setSearch(searchTerm);
+                  setSearch(searchTerm); // Actualiza el valor del estado
 
+                  // Si el término de búsqueda está vacío, se cargan todos los proyectos
                   if (searchTerm === "") {
-                    dispatch(fetchProjectsByUser({ userId: id, page: 1 })); // Cargar todos si no hay búsqueda
+                    dispatch(fetchProjectsByUser({ userId: id, page: 1 }));
                   }
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     const searchTerm = search.trim();
+                    // Solo ejecuta la búsqueda si hay algo en el campo de búsqueda
                     if (searchTerm) {
                       dispatch(
                         fetchProjectsByUser({
@@ -83,18 +88,31 @@ const UserTareas = () => {
               </tr>
             </thead>
             <tbody>
-              {userProjects.map((project) => (
-                <tr key={project.id}>
-                  <td>{project.nombre}</td>
-                  <td>{project.descripcion}</td>
-                  <td>{new Date(project.fecha_inicio).toLocaleDateString()}</td>
-                  <td>
-                    {new Date(project.fecha_finalizacion).toLocaleDateString()}
+              {userProjects.length > 0 ? (
+                userProjects.map((project) => (
+                  <tr key={project.id}>
+                    <td>{project.nombre}</td>
+                    <td>{project.descripcion}</td>
+                    <td>
+                      {new Date(project.fecha_inicio).toLocaleDateString()}
+                    </td>
+                    <td>
+                      {new Date(
+                        project.fecha_finalizacion
+                      ).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>
+                    No se encontraron proyectos con ese término de búsqueda
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
+
           <div className={styles.paginado}>
             <Pagination>
               <Pagination.Prev

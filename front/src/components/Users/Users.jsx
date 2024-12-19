@@ -13,7 +13,7 @@ import DeleteModal from "../Delete/DeleteModal";
 
 const User = () => {
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.users.users.usuarios);
+  const users = useSelector((state) => state.users.users);
   const currentPage = useSelector((state) => state.users.currentPage);
   const totalPages = useSelector((state) => state.users.totalPages);
 

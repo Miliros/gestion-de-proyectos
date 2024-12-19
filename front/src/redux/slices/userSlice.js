@@ -70,7 +70,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.users = action.payload.usuarios;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
       })
@@ -91,12 +91,5 @@ const userSlice = createSlice({
       });
   },
 });
-
-export const selectUsers = (state) => state.users.users;
-export const selectLoading = (state) => state.users.loading;
-export const selectError = (state) => state.users.error;
-
-export const selectUserById = (state, userId) =>
-  state.users.users.find((user) => user.id === userId);
 
 export default userSlice.reducer;

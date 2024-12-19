@@ -34,7 +34,6 @@ export const createTask = async (req, res) => {
       return res.status(400).json({ error: "El usuario asignado no existe" });
     }
 
-    // Crear la tarea
     const result = await pool.query(
       `INSERT INTO tareas (nombre, descripcion, estado, proyecto_id, asignada_a) 
          VALUES ($1, $2, $3, $4, $5) 
@@ -42,17 +41,14 @@ export const createTask = async (req, res) => {
       [nombre, descripcion, estado, proyecto_id, asignada_a]
     );
 
-    // Obtener la tarea creada
     const task = result.rows[0];
 
-    // Obtener el nombre del usuario asignado
     const userResult = await pool.query(
       `SELECT nombre FROM usuarios WHERE id = $1`,
       [task.asignada_a]
     );
     const usuarioNombre = userResult.rows[0]?.nombre;
 
-    // Obtener el nombre del proyecto
     const projectResult = await pool.query(
       `SELECT nombre FROM proyectos WHERE id = $1`,
       [task.proyecto_id]
@@ -73,7 +69,7 @@ export const createTask = async (req, res) => {
 
 export const updateTask = async (req, res) => {
   const { id } = req.params;
-  const { estado, asignada_a } = req.body; // Asegúrate de que estás recibiendo el estado correctamente
+  const { estado, asignada_a } = req.body;
   console.log("datos recibidos", id, estado, asignada_a);
   try {
     const result = await pool.query(
@@ -83,7 +79,7 @@ export const updateTask = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Tarea no encontrada" });
     }
-    res.json(result.rows[0]); // Asegúrate de devolver la tarea actualizada
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Error al actualizar tarea:", error);
     res.status(500).json({ error: "Error al actualizar tarea" });
@@ -98,7 +94,7 @@ export const getTasksByProject = async (req, res) => {
   }
 
   try {
-    const projectId = parseInt(project_id, 10); // Convierte a número
+    const projectId = parseInt(project_id, 10); // Convierte a nUmero
 
     const result = await pool.query(
       `SELECT 
@@ -114,8 +110,6 @@ export const getTasksByProject = async (req, res) => {
       [projectId]
     );
 
-    // console.log("Resultado de la consulta:", result.rows); // Log para verificar el resultado de la consulta
-
     if (result.rows.length === 0) {
       return res
         .status(404)
@@ -130,9 +124,9 @@ export const getTasksByProject = async (req, res) => {
 };
 // Obtener todas las tareas con paginado y búsqueda
 export const getAllTasks = async (req, res) => {
-  let page = parseInt(req.query.page) || 1; // Página por defecto = 1
-  const limit = 6; // Número de elementos por página
-  const search = req.query.search || ""; // Parámetro de búsqueda (por nombre)
+  let page = parseInt(req.query.page) || 1;
+  const limit = 6;
+  const search = req.query.search || "";
 
   // Asegurarse de que la página solicitada no sea menor que 1
   if (page < 1) {
@@ -144,21 +138,20 @@ export const getAllTasks = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    // Contamos las tareas que coinciden con la búsqueda
     const totalResult = await pool.query(
       `SELECT COUNT(*) FROM tareas WHERE nombre ILIKE $1`,
-      [`%${search}%`] // Filtramos por nombre (case-insensitive)
+      [`%${search}%`]
     );
-    const totalTasks = parseInt(totalResult.rows[0].count, 10); // Total de tareas filtradas
+    const totalTasks = parseInt(totalResult.rows[0].count, 10);
 
     const totalPages = Math.ceil(totalTasks / limit);
 
     if (totalPages === 0) {
       return res.status(200).json({
-        tasks: [], // No hay tareas, se devuelve un array vacío
-        totalTasks, // Total de tareas filtradas
-        totalPages, // Total de páginas disponibles
-        currentPage: page, // Página actual
+        tasks: [],
+        totalTasks,
+        totalPages,
+        currentPage: page,
         message: "No se encontraron tareas.",
       });
     }
@@ -169,7 +162,6 @@ export const getAllTasks = async (req, res) => {
         .json({ error: "No hay más resultados para esta búsqueda" });
     }
 
-    // Consultamos las tareas filtradas por nombre
     const result = await pool.query(
       `SELECT 
         t.id, 
@@ -187,12 +179,11 @@ export const getAllTasks = async (req, res) => {
       [`%${search}%`, limit, offset]
     );
 
-    // Si se encuentran tareas, respondemos normalmente
     res.json({
       tasks: result.rows,
-      totalTasks, // Total de tareas filtradas
-      totalPages, // Total de páginas disponibles
-      currentPage: page, // Página actual
+      totalTasks,
+      totalPages,
+      currentPage: page,
     });
   } catch (error) {
     console.error("Error al obtener tareas filtradas:", error);
@@ -200,11 +191,49 @@ export const getAllTasks = async (req, res) => {
   }
 };
 
-// Obtener tareas por userId
+// Obtener tareas por userId con paginación y búsqueda
 export const getTasksByUserId = async (req, res) => {
-  const { userId } = req.params; // Obtener userId desde los parámetros de la solicitud
+  const { userId } = req.params;
+  let page = parseInt(req.query.page) || 1;
+  const limit = 6; // Número de tareas por página
+  const search = req.query.search || ""; // Término de búsqueda
+
+  // Asegurarse de que la página solicitada no sea menor que 1
+  if (page < 1) {
+    return res
+      .status(400)
+      .json({ error: "La página debe ser mayor o igual a 1" });
+  }
+
+  const offset = (page - 1) * limit;
 
   try {
+    // Obtener el total de tareas para el usuario con el término de búsqueda
+    const totalResult = await pool.query(
+      `SELECT COUNT(*) FROM tareas WHERE asignada_a = $1 AND nombre ILIKE $2`,
+      [userId, `%${search}%`]
+    );
+    const totalTasks = parseInt(totalResult.rows[0].count, 10);
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    if (totalPages === 0) {
+      return res.status(200).json({
+        tasks: [],
+        totalTasks,
+        totalPages,
+        currentPage: page,
+        message: "No se encontraron tareas.",
+      });
+    }
+
+    if (page > totalPages) {
+      return res
+        .status(400)
+        .json({ error: "No hay más resultados para esta búsqueda" });
+    }
+
+    // Obtener las tareas para el usuario con paginación y búsqueda
     const result = await pool.query(
       `SELECT 
         t.id, 
@@ -213,30 +242,31 @@ export const getTasksByUserId = async (req, res) => {
         t.estado, 
         t.proyecto_id, 
         p.nombre AS proyecto_nombre
-       FROM tareas t
-       JOIN proyectos p ON t.proyecto_id = p.id
-       WHERE t.asignada_a = $1`,
-      [userId]
+      FROM tareas t
+      JOIN proyectos p ON t.proyecto_id = p.id
+      WHERE t.asignada_a = $1 AND t.nombre ILIKE $2
+      LIMIT $3 OFFSET $4`,
+      [userId, `%${search}%`, limit, offset]
     );
 
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No se encontraron tareas para este usuario" });
-    }
-
-    res.json(result.rows);
+    res.json({
+      tasks: result.rows,
+      totalTasks,
+      totalPages,
+      currentPage: page,
+    });
   } catch (error) {
     console.error("Error al obtener tareas por userId:", error);
     res.status(500).json({ error: "Error al obtener tareas por userId" });
   }
 };
+
 // Eliminar una tarea por ID
 export const deleteTask = async (req, res) => {
-  const { id } = req.params; // Obtener el ID de la tarea desde los parámetros de la solicitud
+  const { id } = req.params;
   try {
     const result = await pool.query(
-      "DELETE FROM tareas WHERE id = $1 RETURNING *", // Eliminar la tarea y devolverla
+      "DELETE FROM tareas WHERE id = $1 RETURNING *",
       [id]
     );
 
@@ -244,7 +274,7 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ error: "Tarea no encontrada" });
     }
 
-    res.status(204).send(); // Enviar respuesta sin contenido
+    res.status(204).send();
   } catch (error) {
     console.error("Error al eliminar tarea:", error);
     res.status(500).json({ error: "Error al eliminar tarea" });

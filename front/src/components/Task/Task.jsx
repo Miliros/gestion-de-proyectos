@@ -26,7 +26,7 @@ import CustomModal from "../CustomModal/CustomModal";
 const Task = () => {
   const dispatch = useDispatch();
   //REDUX
-  const users = useSelector((state) => state.users.users.usuarios);
+  const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
   const tasksFromStore = useSelector((state) => state.tasks.tasks);
@@ -37,7 +37,6 @@ const Task = () => {
 
   //ESTADOS
   const [tasks, setTasks] = useState([]);
-  console.log(tasks);
   const [newTask, setNewTask] = useState({
     name: "",
     status: "pendiente",
@@ -64,6 +63,8 @@ const Task = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  console.log(users);
+
   //
 
   //PAGINADO
@@ -83,17 +84,25 @@ const Task = () => {
   //
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchUsers({ page: 1, search: "" }));
 
-    if (currentUser?.rol === "admin") {
-      dispatch(fetchAllTasks({ page: currentPage }));
-    } else {
-      dispatch(fetchTasksByUserId(currentUser.id));
+    if (currentUser?.id) {
+      if (currentUser?.rol === "admin") {
+        dispatch(fetchAllTasks({ page: currentPage }));
+      } else {
+        dispatch(
+          fetchTasksByUserId({
+            userId: currentUser.id,
+            page: currentPage,
+            search,
+          })
+        );
+      }
     }
-  }, [dispatch, currentUser, currentPage]);
+  }, [dispatch, currentUser, currentPage, search]);
 
   useEffect(() => {
-    console.log("Tareas desde la store", tasksFromStore); // Verifica si las tareas llegan
+    console.log("Tareas desde la store", tasksFromStore);
     setTasks(tasksFromStore);
   }, [tasksFromStore]);
 
@@ -299,6 +308,22 @@ const Task = () => {
         });
       });
   };
+  // Buscar tareas
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.trim();
+    setSearch(searchTerm);
+    if (currentUser?.rol === "admin") {
+      dispatch(fetchAllTasks({ page: 1, search: searchTerm }));
+    } else {
+      dispatch(
+        fetchTasksByUserId({
+          userId: currentUser.id,
+          page: 1,
+          search: searchTerm,
+        })
+      );
+    }
+  };
 
   return (
     <div className={styles.cntnTask}>
@@ -333,17 +358,20 @@ const Task = () => {
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      e.preventDefault();
-
                       const searchTerm = search.trim();
-                      if (searchTerm) {
-                        // Busco con el término ingresado
+
+                      if (currentUser?.rol === "admin") {
                         dispatch(
                           fetchAllTasks({ page: 1, search: searchTerm })
                         );
                       } else {
-                        // Si no hay término, recarga los proyectos normales
-                        dispatch(fetchAllTasks({ page: 1 }));
+                        dispatch(
+                          fetchTasksByUserId({
+                            userId: currentUser.id,
+                            page: 1,
+                            search: searchTerm,
+                          })
+                        );
                       }
                     }
                   }}

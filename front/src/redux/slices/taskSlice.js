@@ -65,13 +65,22 @@ export const updateTask = createAsyncThunk(
 );
 export const fetchTasksByUserId = createAsyncThunk(
   "tasks/fetchByUserId",
-  async (userId) => {
-    const response = await axios.get(`${API_URL}/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async ({ userId, page = 1, search = "" }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/${userId}?page=${page}&search=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 export const deleteTask = createAsyncThunk(
@@ -138,7 +147,9 @@ const tasksSlice = createSlice({
       })
       .addCase(fetchTasksByUserId.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks = action.payload;
+        state.tasks = action.payload.tasks;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchTasksByUserId.rejected, (state, action) => {
         state.loading = false;

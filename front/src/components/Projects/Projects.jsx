@@ -29,7 +29,7 @@ const Projects = () => {
   //redux
   const projects = useSelector((state) => state.projects.projects);
 
-  const users = useSelector((state) => state.users.users.usuarios);
+  const users = useSelector((state) => state.users.users);
   const currentUser = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.projects.loading);
   const currentPage = useSelector((state) => state.projects.currentPage);
@@ -72,7 +72,7 @@ const Projects = () => {
   // Effects
   useEffect(() => {
     dispatch(fetchProjects({ page: currentPage, search }));
-    dispatch(fetchUsers());
+    dispatch(fetchUsers({ page: 1, search: "" }));
   }, [dispatch, currentPage]);
 
   //localstorage
