@@ -29,7 +29,7 @@ const Projects = () => {
   //redux
   const projects = useSelector((state) => state.projects.projects);
 
-  const users = useSelector((state) => state.users.users);
+  const users = useSelector((state) => state.users.users.usuarios);
   const currentUser = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.projects.loading);
   const currentPage = useSelector((state) => state.projects.currentPage);

@@ -182,7 +182,18 @@ const projectSlice = createSlice({
         state.projects = state.projects.filter(
           (project) => project.id !== action.payload
         );
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
+        localStorage.setItem("projects", JSON.stringify(state.projects));
+      })
+      .addCase(fetchProjectsByUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProjectsByUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload;
+      })
+      .addCase(fetchProjectsByUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       });
   },
 });

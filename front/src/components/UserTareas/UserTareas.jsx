@@ -15,20 +15,20 @@ const UserTareas = () => {
   const dispatch = useDispatch();
   console.log(userProjects);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const projectPerPage = 4;
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const projectPerPage = 4;
 
-  const indexOfLastProject = currentPage * projectPerPage;
-  const indexOfFirstProject = indexOfLastProject - projectPerPage;
-  const currentProjects = userProjects.slice(
-    indexOfFirstProject,
-    indexOfLastProject
-  );
+  // const indexOfLastProject = currentPage * projectPerPage;
+  // const indexOfFirstProject = indexOfLastProject - projectPerPage;
+  // const currentProjects = userProjects.slice(
+  //   indexOfFirstProject,
+  //   indexOfLastProject
+  // );
 
-  const totalPages = Math.ceil(userProjects.length / projectPerPage);
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  // const totalPages = Math.ceil(userProjects.length / projectPerPage);
+  // const handlePageChange = (pageNumber) => {
+  //   setCurrentPage(pageNumber);
+  // };
 
   useEffect(() => {
     if (id) {
@@ -61,7 +61,7 @@ const UserTareas = () => {
               </tr>
             </thead>
             <tbody>
-              {currentProjects.map((project) => (
+              {userProjects.map((project) => (
                 <tr key={project.id}>
                   <td>{project.nombre}</td>
                   <td>{project.descripcion}</td>
@@ -73,7 +73,7 @@ const UserTareas = () => {
               ))}
             </tbody>
           </Table>
-          <div className={styles.paginado}>
+          {/* <div className={styles.paginado}>
             <Pagination>
               <Pagination.Prev
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -96,7 +96,7 @@ const UserTareas = () => {
                 className={styles.buttonPagination}
               />
             </Pagination>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

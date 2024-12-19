@@ -46,11 +46,9 @@ const CustomNavbar = () => {
             <Link to="/users" className={`nav-link ${styles.p}`}>
               Usuarios
             </Link>
-            {location.pathname !== "/dashboard" && (
-              <Link to="/dashboard" className={`nav-link ${styles.p}`}>
-                Proyectos
-              </Link>
-            )}
+            <Link to="/dashboard" className={`nav-link ${styles.p}`}>
+              Proyectos
+            </Link>
           </Nav>
 
           <Nav className="ms-auto d-flex align-items-center justify-content-center">
@@ -64,6 +62,12 @@ const CustomNavbar = () => {
                 </div>
               </Dropdown.Toggle>
               <Dropdown.Menu className={styles.customDropdownMenu}>
+                <Dropdown.Item as="div" className={styles.nameUser}>
+                  {user.nombre}
+                </Dropdown.Item>
+
+                <Dropdown.Divider />
+
                 <Dropdown.Item href="#/action-2">Perfil</Dropdown.Item>
                 <Dropdown.Item href="#/action-1" onClick={handleLogout}>
                   Cerrar Sesión

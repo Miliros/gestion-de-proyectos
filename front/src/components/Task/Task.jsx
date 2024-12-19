@@ -26,7 +26,7 @@ import CustomModal from "../CustomModal/CustomModal";
 const Task = () => {
   const dispatch = useDispatch();
   //REDUX
-  const users = useSelector((state) => state.users.users);
+  const users = useSelector((state) => state.users.users.usuarios);
   const currentUser = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.projects);
   const tasksFromStore = useSelector((state) => state.tasks.tasks);

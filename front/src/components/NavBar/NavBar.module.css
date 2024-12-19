@@ -48,6 +48,16 @@
   border: 1px solid white !important;
   /* font-weight: 300 !important; */
 }
+.nameUser {
+  color: #b8d85c !important;
+  padding-left: 12px !important;
+  margin: 0px !important;
+  letter-spacing: 1.2px !important;
+  font-size: 16px !important;
+}
+.nameUser:hover {
+  background-color: transparent !important;
+}
 .dropdownContainer {
   display: flex;
   align-items: center;

@@ -9,6 +9,7 @@ const NewProjectForm = ({
   handleSubmit,
   isEditing,
 }) => {
+  console.log(users);
   return (
     <form onSubmit={handleSubmit}>
       <div>
@@ -80,7 +81,7 @@ const NewProjectForm = ({
             onChange={handleChange}
           >
             <option value="">Selecciona un usuario</option>
-            {users.map((user) => (
+            {users?.map((user) => (
               <option
                 key={user.id}
                 value={user.id}

@@ -22,7 +22,7 @@ const DeleteModal = ({
       </Modal.Header>
       <Modal.Body>
         <p>{description}</p>
-        <div className="d-flex justify-content-center mt-4">
+        <div className="d-flex justify-content-center">
           <Button
             className={`${styles.customButtonDeleteConfirm2} btn btn-sm rounded-pill`}
             onClick={onHide}
