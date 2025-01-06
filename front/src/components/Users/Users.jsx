@@ -7,6 +7,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import styles from "./Users.module.css";
+import { FiUsers } from "react-icons/fi";
 
 import Title from "../Title/Title";
 import DeleteModal from "../Delete/DeleteModal";
@@ -62,11 +63,10 @@ const User = () => {
 
   return (
     <div className={styles.cntnUser}>
-      <Title text="usuarios" />
+      <Title text="usuarios" subText="Usuarios registrados" />
       <div className={`${styles.cntnTable} table-responsive`}>
         <div className={styles.titleAndButton}>
-          <p className={styles.title}>Usuarios registrados</p>
-
+          <FiUsers size={24} color="green" />
           <div className={styles.inputs}>
             <i className="fa fa-search"></i>
             <input

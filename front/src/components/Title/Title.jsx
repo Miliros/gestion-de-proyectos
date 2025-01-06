@@ -1,19 +1,24 @@
 import React from "react";
-import { useSelector } from "react-redux";
-
 import styles from "./Title.module.css";
 
-const Title = ({ text }) => {
-  const user = useSelector((state) => state.auth.user);
-
+const Title = ({ text, subText, userName }) => {
   return (
     <div className={styles.CntText}>
-      <p className={styles.textUser}>Bienvenido/a, {user?.nombre}</p>
-      <p className={styles.text}>
-        Administra, gestiona y visualiza tus
-        <span className={styles.span}>{text}</span>
-      </p>
+      {userName && <p className={styles.textUser}>Bienvenido/a, {userName}</p>}
+      {text && (
+        <p className={styles.text}>
+          Administra, gestiona y visualiza tus
+          <span className={styles.span}>{text}</span>
+        </p>
+      )}
+
+      {subText && (
+        <span>
+          <p className={styles.text}>{subText}</p>
+        </span>
+      )}
     </div>
   );
 };
+
 export default Title;

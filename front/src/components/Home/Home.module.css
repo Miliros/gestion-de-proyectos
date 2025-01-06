@@ -1,9 +1,59 @@
 .cntnHome {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  height: 100vh;
-  /* padding-top: 50px; */
-  background-image: url("mii.jpg");
+  align-items: center;
+  height: 93vh;
+  padding-top: 20px;
+  padding-left: 20px;
+  /* background-image: url("mii.jpg"); */
+}
+.cntnCards {
+  justify-content: left;
+}
+
+.textUser {
+  color: white;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: left;
+  letter-spacing: 1px;
+  margin: 0px;
+}
+
+.cardsRow {
+  width: 80%;
+  max-width: 1200px;
+  justify-content: flex-start;
+  margin-top: 20px !important;
+}
+
+.customCard {
+  border: none;
+  border-radius: 122px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: black;
+  color: white;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: start;
+}
+
+.cardText {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: start;
+  margin-top: 10px;
+}
+.cardLink {
+  text-decoration: none;
+}
+.cardLink:hover {
+  text-decoration: none;
+}
+.icon {
+  text-align: start;
+  margin-bottom: 18px;
 }

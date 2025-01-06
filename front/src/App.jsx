@@ -7,14 +7,17 @@ import Task from "./components/Task/Task";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/NavBar/NavBar";
 import User from "./components/Users/Users";
+import UserTareas from "./components/UserTareas/UserTareas";
 import { ToastContainer } from "react-toastify"; // Importa ToastContainer
 import "react-toastify/dist/ReactToastify.css"; // Importa estilos de react-toastify
+import Footer from "./components/Footer/Footer";
 
 function DashboardLayout({ children }) {
   return (
     <>
       <Navbar />
-      <div>{children}</div>
+      <div style={{ paddingTop: "89px" }}>{children}</div>
+      <Footer />
     </>
   );
 }
@@ -63,6 +66,16 @@ function App() {
             <PrivateRoute>
               <DashboardLayout>
                 <User />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/userTareas"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <UserTareas />
               </DashboardLayout>
             </PrivateRoute>
           }

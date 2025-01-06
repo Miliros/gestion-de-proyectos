@@ -21,6 +21,7 @@ const CustomNavbar = () => {
         .join("")
         .toUpperCase()
     : "?";
+  const proyectosPath = user?.rol === "admin" ? "/projects" : "/userTareas";
 
   return (
     <Navbar
@@ -40,13 +41,16 @@ const CustomNavbar = () => {
         />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mx-auto">
+            <Link to="/dashboard" className={`nav-link ${styles.p}`}>
+              Home
+            </Link>
             <Link to="/tasks" className={`nav-link ${styles.p}`}>
               Tareas
             </Link>
             <Link to="/users" className={`nav-link ${styles.p}`}>
               Usuarios
             </Link>
-            <Link to="/dashboard" className={`nav-link ${styles.p}`}>
+            <Link to={proyectosPath} className={`nav-link ${styles.p}`}>
               Proyectos
             </Link>
           </Nav>

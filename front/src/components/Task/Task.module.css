@@ -1,12 +1,10 @@
 .cntnTask {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   height: 100vh;
-  padding-top: 73px;
+  padding-top: 20px;
   width: 100%;
-  background-image: url(../Home//mii.jpg);
 }
 .cntnTable {
   display: flex;

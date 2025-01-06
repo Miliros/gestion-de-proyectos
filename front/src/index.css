@@ -1,7 +1,7 @@
 body {
   margin: 0px;
   text-align: center;
-  /* padding: 2px; */
+  background-image: url("./mii.jpg");
 }
 
 .tbody,
@@ -10,12 +10,9 @@ tfoot,
 th,
 thead,
 tr {
-  /* background-color: #ebe9e2 !important; */
   border: 1px solid rgba(0, 0, 0, 0.096) !important;
 }
-/* :root {
-  --bs-body-bg: #ebe9e2 !important;
-} */
+
 .form-check-input:checked {
   background-color: black !important;
   box-shadow: none !important;
@@ -40,6 +37,7 @@ tr {
   box-shadow: none !important;
   border: 1px solid black !important;
 }
+
 .btn-group-sm > .btn,
 .btn-sm {
   -bs-btn-padding-y: 0rem !important;
@@ -69,11 +67,8 @@ tr {
   font-size: 0.2rem;
   color: #6c757d;
 }
-/* .modal-body {
-  padding: 0px !important;
-} */
+
 .modal-content {
-  /* padding: 15px; */
   min-height: 160px !important;
   max-height: 640px !important;
 }
@@ -105,4 +100,14 @@ p {
 }
 .pagination {
   margin: 0px !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  appearance: none !important;
+  background-color: transparent !important;
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }

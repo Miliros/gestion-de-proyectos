@@ -1,13 +1,13 @@
 .cntnUser {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   height: 100vh;
-  padding-top: 73px;
   width: 100%;
   background-image: url("../Home/mii.jpg");
   background-color: transparent;
+  padding-top: 20px;
 }
 .cntnTable {
   width: 80%;

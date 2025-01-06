@@ -14,6 +14,7 @@ import Table from "react-bootstrap/Table";
 import { Modal, Button, Pagination } from "react-bootstrap";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import { GoProjectRoadmap } from "react-icons/go";
 
 import NewProjectForm from "./NewProjectForm";
 import Title from "../Title/Title";
@@ -65,7 +66,6 @@ const Projects = () => {
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       dispatch(fetchProjects({ page }));
-      // Asegúrate de actualizar el estado local de la página
     }
   };
 
@@ -158,7 +158,6 @@ const Projects = () => {
       !editingProject.fecha_finalizacion ||
       !editingProject.usuario_id
     ) {
-      // Si alguna condición no se cumple, mostrar  error
       toast.error("Por favor completa todos los campos.", {
         position: "bottom-right",
         autoClose: 3000,
@@ -166,7 +165,7 @@ const Projects = () => {
       return; // no ejecuto
     }
 
-    // Si la validacion es correcta, procedo con la actualización
+    // Si la validacion es correcta, actualizo
     dispatch(
       updateProject({
         id: editingProjectId,
@@ -234,11 +233,10 @@ const Projects = () => {
         <p>Cargando...</p>
       ) : (
         <>
-          <Title text="Proyectos" />
+          <Title text="Proyectos" subText="Proyectos activos" />
           <div className={`${styles.cntnTable} table-responsive`}>
             <div className={styles.titleAndButton}>
-              <p className={styles.title}>Proyectos activos</p>
-
+              <GoProjectRoadmap size={24} color="green" />
               <div className={styles.inputs}>
                 <i className="fa fa-search"></i>
                 <input

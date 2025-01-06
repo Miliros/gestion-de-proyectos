@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import { GoTasklist } from "react-icons/go";
 
 import Title from "../Title/Title";
 import DeleteModal from "../Delete/DeleteModal";
@@ -331,14 +332,10 @@ const Task = () => {
         <p>Cargando...</p>
       ) : (
         <>
-          <Title text="tareas" />
+          <Title text="tareas" subText="Tareas activas" />
           <div className={`${styles.cntnTable} table-responsive`}>
             <div className={styles.titleAndButton}>
-              <p className={styles.title}>
-                {currentUser?.rol === "admin"
-                  ? "Todas las Tareas"
-                  : "Tus tareas"}
-              </p>
+              <GoTasklist size={24} color="green" />
 
               <div className={styles.inputs}>
                 <i className="fa fa-search"></i>
