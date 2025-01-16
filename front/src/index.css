@@ -2,6 +2,7 @@ body {
   margin: 0px;
   text-align: center;
   background-image: url("./mii.jpg");
+  font-family: "Vercetti";
 }
 
 .tbody,
@@ -12,7 +13,12 @@ thead,
 tr {
   border: 1px solid rgba(0, 0, 0, 0.096) !important;
 }
-
+@font-face {
+  font-family: "Vercetti";
+  src: url("./Vercetti-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 .form-check-input:checked {
   background-color: black !important;
   box-shadow: none !important;
@@ -110,4 +116,7 @@ input:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px #fff inset !important;
   -webkit-text-fill-color: #000 !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+.text-orange {
+  color: orange;
 }

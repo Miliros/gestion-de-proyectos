@@ -130,8 +130,10 @@
   font-weight: 600;
   border: none;
 }
+
 .td {
-  font-size: 14.3px !important;
+  align-items: center;
+  font-size: 13.2px !important;
 }
 
 .customButtonForm {

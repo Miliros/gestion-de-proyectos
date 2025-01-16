@@ -16,19 +16,19 @@ const Home = () => {
       title: "Proyectos",
       text: "Administra, gestiona y visualiza todos tus proyectos.",
       path: user?.rol === "admin" ? "/projects" : "/userTareas",
-      icon: <GoProjectRoadmap size={26} />, // Ícono para Proyectos
+      icon: <GoProjectRoadmap size={26} color="green" />, // Ícono para Proyectos
     },
     {
       title: "Tareas",
       text: "Organiza, asigna y realiza un seguimiento de tus tareas.",
       path: "/tasks",
-      icon: <GoTasklist size={26} />, // Ícono para Proyectos
+      icon: <GoTasklist size={27} color="green" />, // Ícono para Proyectos
     },
     {
       title: "Usuarios",
       text: "Gestiona los usuarios y permisos de tu plataforma.",
       path: "/users",
-      icon: <FiUsers size={26} />, // Ícono para Proyectos
+      icon: <FiUsers size={26} color="green" />, // Ícono para Proyectos
     },
   ];
 
@@ -38,10 +38,12 @@ const Home = () => {
         <Title
           userName={user?.nombre}
           subText="Organiza y gestiona tu trabajo de manera eficiente."
+          highlight="Organiza y gestiona tu trabajo"
         />
+
         <Row className={styles.cardsRow}>
           {cards.map((card, index) => (
-            <Col key={index} md={5} className="mb-5 me-4">
+            <Col key={index} md={4} className="mb-5 me-4">
               <Link to={card.path} className={styles.cardLink}>
                 <Card className={styles.customCard}>
                   <Card.Body className={styles.cardBody}>

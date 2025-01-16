@@ -233,7 +233,7 @@ const Projects = () => {
         <p>Cargando...</p>
       ) : (
         <>
-          <Title text="Proyectos" subText="Proyectos activos" />
+          <Title text=" Proyectos" subText="Proyectos activos" />
           <div className={`${styles.cntnTable} table-responsive`}>
             <div className={styles.titleAndButton}>
               <GoProjectRoadmap size={24} color="green" />

@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
 import { useLocation, Link, NavLink } from "react-router-dom";
 import styles from "./NavBar.module.css";
+import logo from "./logo.png";
 
 const CustomNavbar = () => {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ const CustomNavbar = () => {
     >
       <Container fluid>
         <Navbar.Brand href="#" className={styles.brand}>
-          GESTION DE PROYECTOS
+          <img className={styles.logo} src={logo} />
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="responsive-navbar-nav"

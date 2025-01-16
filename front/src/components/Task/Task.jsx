@@ -332,7 +332,7 @@ const Task = () => {
         <p>Cargando...</p>
       ) : (
         <>
-          <Title text="tareas" subText="Tareas activas" />
+          <Title text=" tareas" subText="Tareas activas" />
           <div className={`${styles.cntnTable} table-responsive`}>
             <div className={styles.titleAndButton}>
               <GoTasklist size={24} color="green" />
@@ -401,7 +401,7 @@ const Task = () => {
               <tbody>
                 {tasks.length > 0 ? (
                   tasks.map((task) => (
-                    <tr key={task.id}>
+                    <tr className={styles.tr} key={task.id}>
                       <td>
                         <OverlayTrigger
                           placement="top"
@@ -423,11 +423,11 @@ const Task = () => {
                       <td className={styles.td}>{task.nombre}</td>
                       <td className={styles.td}>
                         {task.estado === "completada" ? (
-                          <span className="text-danger me-3">Completada</span>
+                          <span className="text-success me-3">Completada</span>
                         ) : task.estado === "en progreso" ? (
                           <span className="text-primary me-3">En progreso</span>
                         ) : (
-                          <span className="text-success me-3">Pendiente</span>
+                          <span className="text-orange me-3">Pendiente</span>
                         )}
                       </td>
                       {currentUser.rol === "admin" && (

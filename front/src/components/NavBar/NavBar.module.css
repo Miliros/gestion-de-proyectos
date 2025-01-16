@@ -1,5 +1,5 @@
 .nav {
-  padding: 10px !important;
+  padding: 0.5rem 1rem;
   background-color: transparent !important;
   /* background-color: #ebe9e2 !important; */
   border-bottom: 1px solid rgba(255, 255, 255, 0.623);
@@ -17,6 +17,11 @@
 .brand {
   color: white !important;
 }
+.logo {
+  max-height: 62px;
+  width: auto;
+}
+
 .p {
   color: white !important;
   padding: 8px !important;
@@ -74,8 +79,8 @@
 }
 
 .dropdownCircle {
-  height: 40px;
-  width: 40px;
+  height: 38px;
+  width: 38px;
   background-color: #b8d85c;
   display: flex;
   justify-content: center;
@@ -87,15 +92,16 @@
   margin: 0;
   color: black;
   font-weight: 600;
+  font-size: 13px;
 }
 
 .customDropdownToggle::after {
   display: none !important;
 }
 .customDropdownMenu {
-  margin-top: 0.9rem; /* Espacio para evitar superposición */
-  transform: translateX(-80px); /* Desplaza a la izquierda para alinearlo */
-  z-index: 1050; /* Asegura que esté por encima de otros elementos */
+  margin-top: 0.9rem;
+  transform: translateX(-105px);
+  z-index: 1050;
 }
 
 @media (max-width: 768px) {

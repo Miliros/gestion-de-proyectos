@@ -8,8 +8,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/NavBar/NavBar";
 import User from "./components/Users/Users";
 import UserTareas from "./components/UserTareas/UserTareas";
-import { ToastContainer } from "react-toastify"; // Importa ToastContainer
-import "react-toastify/dist/ReactToastify.css"; // Importa estilos de react-toastify
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Footer from "./components/Footer/Footer";
 
 function DashboardLayout({ children }) {

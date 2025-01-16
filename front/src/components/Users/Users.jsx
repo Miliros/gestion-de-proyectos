@@ -63,7 +63,7 @@ const User = () => {
 
   return (
     <div className={styles.cntnUser}>
-      <Title text="usuarios" subText="Usuarios registrados" />
+      <Title text=" usuarios" subText="Usuarios registrados" />
       <div className={`${styles.cntnTable} table-responsive`}>
         <div className={styles.titleAndButton}>
           <FiUsers size={24} color="green" />
