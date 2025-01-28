@@ -5,12 +5,6 @@ const Title = ({ text, subText, userName, highlight }) => {
   return (
     <div className={styles.CntText}>
       {userName && <p className={styles.textUser}>Bienvenido/a, {userName}</p>}
-      {text && (
-        <p className={styles.text}>
-          Administra, gestiona y visualiza tus
-          <span className={styles.span}>{text}</span>
-        </p>
-      )}
 
       {subText && (
         <span>
@@ -26,6 +20,12 @@ const Title = ({ text, subText, userName, highlight }) => {
             )}
           </p>
         </span>
+      )}
+      {text && (
+        <p className={styles.text}>
+          Administra, gestiona y visualiza tus
+          <span className={styles.span}>{text}</span>
+        </p>
       )}
     </div>
   );
