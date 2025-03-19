@@ -3,17 +3,14 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/usuarios";
 
-// Función para obtener el token del localStorage
 const getToken = () => {
   return localStorage.getItem("token");
 };
 
-// Función para manejar la redirección a login
-const redirectToLogin = (history) => {
-  history.push("/login");
+const redirectToLogin = (navigate) => {
+  navigate("/");
 };
 
-// Función para obtener los usuarios con paginación y búsqueda
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
   async ({ page = 1, search = "" }, { rejectWithValue, getState }) => {
@@ -28,7 +25,6 @@ export const fetchUsers = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      // Si el error es 401 o 403, se redirige al login
       if (
         error.response &&
         (error.response.status === 401 || error.response.status === 403)

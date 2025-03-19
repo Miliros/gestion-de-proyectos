@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../../axiosConfig";
 import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/tasks";
@@ -11,7 +12,7 @@ export const fetchAllTasks = createAsyncThunk(
   "tasks/fetchAllTasks",
   async ({ page = 1, search = "" }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/all?page=${page}&search=${search}`,
         {
           headers: {
@@ -19,7 +20,7 @@ export const fetchAllTasks = createAsyncThunk(
           },
         }
       );
-      return response.data; // Asegúrate de que el backend devuelva los datos correctamente
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response ? error.response.data : error.message
@@ -30,37 +31,73 @@ export const fetchAllTasks = createAsyncThunk(
 
 export const fetchTasksByProject = createAsyncThunk(
   "tasks/fetchByProject",
-  async (projectId) => {
-    const response = await axios.get(`${API_URL}?project_id=${projectId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async (projectId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}?project_id=${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
 export const createTask = createAsyncThunk(
   "tasks/createTask",
-  async (newTask) => {
-    const response = await axios.post(API_URL, newTask, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async (newTask, { rejectWithValue }) => {
+    try {
+      const response = await api.post(API_URL, newTask, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 
 export const updateTask = createAsyncThunk(
   "tasks/updateTask",
-  async ({ id, updatedTask }) => {
-    const response = await axios.patch(`${API_URL}/${id}`, updatedTask, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+  async ({ id, updatedTask }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`${API_URL}/${id}`, updatedTask, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
+);
+
+export const deleteTask = createAsyncThunk(
+  "tasks/deleteTask",
+  async (taskId, { rejectWithValue }) => {
+    try {
+      await api.delete(`${API_URL}/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      return taskId;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
   }
 );
 export const fetchTasksByUserId = createAsyncThunk(
@@ -83,17 +120,7 @@ export const fetchTasksByUserId = createAsyncThunk(
     }
   }
 );
-export const deleteTask = createAsyncThunk(
-  "tasks/deleteTask",
-  async (taskId) => {
-    await axios.delete(`${API_URL}/${taskId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return taskId; // Retornar el ID de la tarea eliminada
-  }
-);
+
 const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
@@ -112,13 +139,13 @@ const tasksSlice = createSlice({
       })
       .addCase(fetchAllTasks.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks = action.payload.tasks; // Asumiendo que el backend devuelve una propiedad 'tasks'
+        state.tasks = action.payload.tasks;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchAllTasks.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       .addCase(fetchTasksByProject.pending, (state) => {
         state.loading = true;

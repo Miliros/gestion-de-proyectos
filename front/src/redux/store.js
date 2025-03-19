@@ -1,5 +1,6 @@
 // src/redux/store.js
 import { configureStore } from "@reduxjs/toolkit";
+import { setUpInterceptors } from "../../axiosConfig";
 import authReducer from "./slices/authSlice";
 import projectReducer from "./slices/projectSlice";
 import userReducer from "./slices/userSlice";
@@ -12,5 +13,5 @@ const store = configureStore({
     tasks: taskSlice,
   },
 });
-
+setUpInterceptors(store);
 export default store;

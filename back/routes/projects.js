@@ -7,7 +7,7 @@ import {
   deleteProject,
   getProjectsByUserId,
 } from "../controllers/projectController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js"; // Asegúrate de importar el middleware
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 

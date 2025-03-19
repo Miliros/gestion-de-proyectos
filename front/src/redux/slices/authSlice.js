@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { fetchUsers } from "./userSlice";
+import api from "../../../axiosConfig";
+
 import { toast } from "react-toastify";
 
 //accion para registrar un nuevo usuario
@@ -8,10 +9,7 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        userData
-      );
+      const response = await api.post("/api/auth/register", userData);
       const { token, user } = response.data;
 
       localStorage.setItem("token", token);
@@ -31,10 +29,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, { dispatch, rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        userData
-      );
+      const response = await api.post("/api/auth/login", userData);
       const { token, user } = response.data;
 
       localStorage.setItem("token", token);
@@ -51,10 +46,10 @@ export const loginUser = createAsyncThunk(
 
 // Estado inicial con verificación del token y el usuario en localStorage
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null, // Carga el usuario desde localStorage
+  user: JSON.parse(localStorage.getItem("user")) || null,
   loading: false,
   error: null,
-  isAuthenticated: !!localStorage.getItem("token"), // Verifica si hay un token almacenado
+  isAuthenticated: !!localStorage.getItem("token"),
 };
 
 const authSlice = createSlice({
@@ -74,37 +69,45 @@ const authSlice = createSlice({
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
-        state.error = null; // Resetea el error al iniciar el registro
+        state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload; // Almacena el usuario en el estado
-        state.isAuthenticated = true; // Marca el estado como autenticado
-        state.loading = false; // Finaliza el estado de carga
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.error =
-          action.payload?.message || "Error al registrar el usuario.";
+          action.payload?.message ||
+          action.error?.message ||
+          "Error desconocido";
         state.loading = false;
       })
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null; // Resetea el error al iniciar el login
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload; // Almacena el usuario en el estado
-        state.isAuthenticated = true; // Marca el estado como autenticado
-        state.loading = false; // Finaliza el estado de carga
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.error =
-          action.payload?.message || "Usuario o contraseña incorrectos";
+          action.payload?.message ||
+          action.error?.message ||
+          "Error desconocido";
         state.loading = false;
+
+        if (action.payload?.error === "Token has expired") {
+          state.isAuthenticated = false;
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
       });
   },
 });
 
-// Exportar la acción de logout
 export const { logout } = authSlice.actions;
 
-// Exportar el reducer
 export default authSlice.reducer;

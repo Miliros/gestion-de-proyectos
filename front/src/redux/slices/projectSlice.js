@@ -6,10 +6,6 @@ const API_URL = "http://localhost:5000/api/projects";
 const getToken = () => {
   return localStorage.getItem("token");
 };
-// Función para manejar la redirección a login
-const redirectToLogin = (history) => {
-  history.push("/login");
-};
 
 export const fetchProjects = createAsyncThunk(
   "projects/fetchProjects",
@@ -27,13 +23,6 @@ export const fetchProjects = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      // Si el error es 401 o 403, se redirige al login
-      if (
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        redirectToLogin(getState().history);
-      }
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -53,12 +42,6 @@ export const createProject = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      if (
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        redirectToLogin(); // Redirigir al login si el token no es válido
-      }
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -78,12 +61,6 @@ export const updateProject = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      if (
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        redirectToLogin();
-      }
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -103,12 +80,6 @@ export const deleteProject = createAsyncThunk(
       });
       return id;
     } catch (error) {
-      if (
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        redirectToLogin();
-      }
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -129,14 +100,8 @@ export const fetchProjectsByUser = createAsyncThunk(
           },
         }
       );
-      return response.data; // Asegúrate de que el backend devuelva `projects`, `totalPages` y `currentPage`.
+      return response.data;
     } catch (error) {
-      if (
-        error.response &&
-        (error.response.status === 401 || error.response.status === 403)
-      ) {
-        redirectToLogin();
-      }
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -168,18 +133,18 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message; // Manejar error del servidor o genérico
+        state.error = action.payload || action.error.message;
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.projects.push(action.payload);
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Guarda en localStorage
+        localStorage.setItem("projects", JSON.stringify(state.projects));
       })
       .addCase(updateProject.fulfilled, (state, action) => {
         const updatedProject = action.payload;
         state.projects = state.projects.map((project) =>
           project.id === updatedProject.id ? updatedProject : project
         );
-        localStorage.setItem("projects", JSON.stringify(state.projects)); // Actualiza localStorage
+        localStorage.setItem("projects", JSON.stringify(state.projects));
       })
       .addCase(deleteProject.fulfilled, (state, action) => {
         state.projects = state.projects.filter(
