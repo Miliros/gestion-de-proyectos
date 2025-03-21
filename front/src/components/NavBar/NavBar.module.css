@@ -13,7 +13,11 @@
   border-bottom: 1px solid black;
   margin: 0px !important;
 }
-
+.scrolled {
+  background-color: #000 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: #000;
+}
 .brand {
   color: white !important;
 }

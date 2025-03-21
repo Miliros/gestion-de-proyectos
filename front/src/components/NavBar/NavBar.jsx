@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
-import { useLocation, Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import logo from "./logo.png";
 
 const CustomNavbar = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [navResponsive, setNavResponsive] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
   const user = useSelector((state) => state.auth.user);
   const userInitials = user?.nombre
     ? user.nombre
@@ -22,14 +23,30 @@ const CustomNavbar = () => {
         .join("")
         .toUpperCase()
     : "?";
+
   const proyectosPath = user?.rol === "admin" ? "/projects" : "/userTareas";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <Navbar
       collapseOnSelect
       expand="lg"
       fixed="top"
-      className={navResponsive ? styles.navOne : styles.nav}
+      className={`${styles.nav} ${isScrolled ? styles.scrolled : ""}`}
     >
       <Container fluid>
         <Navbar.Brand href="#" className={styles.brand}>
